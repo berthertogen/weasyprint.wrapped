@@ -43,7 +43,7 @@ jobs:
         with:
           name: assets
       - name: Upload release asset linux
-        id: upload-release-asset 
+        id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
       - name: Upload release asset windows
-        id: upload-release-asset 
+        id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
