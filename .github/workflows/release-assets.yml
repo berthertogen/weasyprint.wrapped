@@ -1,0 +1,10 @@
+name: release-assets
+on: [push]
+jobs:
+  release-linux-asset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Perform a Pester test from the command-line
+        shell: pwsh
+        run: ./build-on-linux.ps1
