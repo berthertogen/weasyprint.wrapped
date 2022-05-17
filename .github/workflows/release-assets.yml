@@ -1,13 +1,33 @@
 name: release-assets
 on: [push]
 jobs:
-  release-linux-asset:
+  build-linux-asset:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build linux assets
+      - name: Build linux asset
         shell: pwsh
         run: ./build-on-linux.ps1
+      - name: Upload linux asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-linux-64.zip
+  build-windows-asset:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build windows asset
+        shell: pwsh
+        run: ./build-on-windows.ps1
+      - name: Upload windows asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-windows-64.zip
+  release-asset:
+    runs-on: ubuntu-latest
+    steps:
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -18,13 +38,28 @@ jobs:
           release_name: Release 0.0.1
           draft: true
           prerelease: true
-      - name: Upload release asset
+      - name: Download assets
+        uses: actions/download-artifact@v3
+        with:
+          name: assets
+      - name: Upload release asset linux
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./assets/standalone-linux-64.zip
+          asset_path: standalone-linux-64.zip
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
+      - name: Upload release asset windows
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: standalone-windows-64.zip
+          asset_name: standalone-windows-64.zip
+          asset_content_type: application/zip
+  
