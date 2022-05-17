@@ -1,4 +1,4 @@
-$workingDir = "./standalone-win-64";
+$workingDir = "./standalone-windows-64";
 $assets = "./assets";
 
 if (Test-Path $workingDir) {
@@ -13,7 +13,7 @@ if (!(Test-Path $assets)) {
     New-Item -ItemType "directory" -Path $assets | Out-Null
 }
 
-$workingDir = Resolve-Path -Path "./standalone-win-64";
+$workingDir = Resolve-Path -Path "./standalone-windows-64";
 $assets = Resolve-Path -Path "./assets";
 
 Write-Host "*** Downloading gtk3 (https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer)"
@@ -34,5 +34,5 @@ Write-Host "*** Testing weasyprint"
 Invoke-Expression ".\python.exe -m weasyprint --info"
 Set-Location  "../../"
 
-Write-Host "*** Create archive $assets/standalone-linux-64.zip"
-Compress-Archive -Path "$workingDir/*"  -DestinationPath "$assets/standalone-win-64.zip" -CompressionLevel "Fastest" -Force
+Write-Host "*** Create archive $assets/standalone-windows-64.zip"
+Compress-Archive -Path "$workingDir/*"  -DestinationPath "$assets/standalone-windows-64.zip" -CompressionLevel "Fastest" -Force

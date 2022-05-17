@@ -27,6 +27,7 @@ jobs:
           path: ./assets/standalone-windows-64.zip
   release-asset:
     runs-on: ubuntu-latest
+    needs: [build-linux-asset, build-windows-asset]
     steps:
       - name: Create release
         id: create_release
