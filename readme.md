@@ -19,10 +19,16 @@ cd c:\weasyprint.wrapped\standalone-win-64\python
 .\python.exe -m weasyprint --info
 ```
 
-## Ubuntu (build-on-ubuntu.ps1 does approximately this)
+## Linux (build-on-linux.ps1 does approximately this)
 
 * Install powershell on ubuntu (https://docs.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.2)
-* Download https://github.com/indygreg/python-build-standalone/releases (correct release, eg: cpython-3.10.4+20220502-x86_64-unknown-linux-gnu-install_only.tar.gz for Linux) and extract to c:\weasyprint.wrapped\standalone-win-64\python
+* Download https://github.com/indygreg/python-build-standalone/releases (correct release, eg: cpython-3.10.4+20220502-x86_64-unknown-linux-gnu-install_only.tar.gz for Linux) and extract to c:\weasyprint.wrapped\standalone-linux-64\python
+* Install weasyprint in the standalone python
+```
+cd c:\weasyprint.wrapped\standalone-linux-64\python\bin\
+python3 -m pip install weasyprint
+python3 -m weasyprint --info
+```
 
 ## Help
 
