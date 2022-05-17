@@ -28,5 +28,5 @@ Write-Host "*** Testing weasyprint"
 Invoke-Expression "python3 -m weasyprint --info"
 Set-Location  "../../../"
 
-Write-Host "*** Create archive"
+Write-Host "*** Create archive $assets/standalone-linux-64.zip"
 Compress-Archive -Path "$workingDir/*"  -DestinationPath "$assets/standalone-linux-64.zip" -CompressionLevel "Fastest" -Force
