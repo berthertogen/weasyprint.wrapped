@@ -25,7 +25,8 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Test
-        run: dotnet test --verbosity normal
+        run: dotnet test  --verbosity normal
+        working-directory: ./src/Weasyprint.Wrapped.Tests
       - name: Upload windows asset
         uses: actions/upload-artifact@v3
         with:
