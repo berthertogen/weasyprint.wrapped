@@ -57,6 +57,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: assets
+      - name: Create nuget package
+        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID --out nupkgs
+        working-directory: ./src/Weasyprint.Wrapped
+      - name: Upload nuget package
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./src/Weasyprint.Wrapped/nupkgs/Weasyprint.Wrapped.$GITHUB_RUN_ID.nupkg
+          asset_name: Weasyprint.Wrapped.$GITHUB_RUN_ID.nupkg
+          asset_content_type: application/zip
       - name: Upload release asset linux
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
