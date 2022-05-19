@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Weasyprint.Wrapped.Tests;
 
+[Collection("Integration")]
 public class PrinterTests
 {
     public PrinterTests()
