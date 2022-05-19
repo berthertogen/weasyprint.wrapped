@@ -16,7 +16,7 @@ public class InitializerTests
     [Fact]
     public void Do_UnzipsAssetToFolder()
     {
-        new Initializer(new StubConfigurationProvider()).Do();
+        new Initializer(new StubConfigurationProvider()).Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.True(Directory.Exists("./weasyprinter/python"));
@@ -27,7 +27,7 @@ public class InitializerTests
     {
         Directory.CreateDirectory("./weasyprinter");
 
-        new Initializer(new StubConfigurationProvider()).Do();
+        new Initializer(new StubConfigurationProvider()).Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.False(Directory.Exists("./weasyprinter/python"));

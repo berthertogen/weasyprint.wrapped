@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -12,15 +13,15 @@ public class PrinterTests
         if (Directory.Exists("./weasyprinter")) {
             Directory.Delete("./weasyprinter", true);
         }
-        new Initializer(new StubConfigurationProvider()).Do();
+        new Initializer(new StubConfigurationProvider()).Initialize();
     }
 
     [Fact]
-    public async Task Do_RunsCommandUnderWindows()
+    public async Task Do_RunsCommand()
     {
         var stub = new StubCliRunner();
 
-        var result = await new Printer(stub).Do("<html><body><h1>TEST</h1></body></html>");
+        var result = await new Printer(stub).Print("<html><body><h1>TEST</h1></body></html>");
 
         Assert.Empty(stub.Errors);
         Assert.True(File.Exists(stub.OutputFile));

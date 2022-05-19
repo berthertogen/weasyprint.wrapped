@@ -10,7 +10,7 @@ public class Initializer
         this.assetProvider = assetProvider;
     }
 
-    public void Do()
+    public void Initialize()
     {
         if (Directory.Exists(assetProvider.GetWorkingFolder()))
         {

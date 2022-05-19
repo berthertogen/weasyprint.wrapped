@@ -6,7 +6,7 @@ public class ConfigurationProvider
     protected readonly string binFolder;
     protected string workingFolder;
 
-    public ConfigurationProvider() : this("./weasyprinter") { }
+    public ConfigurationProvider() : this("weasyprinter") { }
 
     public ConfigurationProvider(string workingFolder)
     {
@@ -23,7 +23,7 @@ public class ConfigurationProvider
 
     public virtual string GetAsset() {
         var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
-        return Path.Combine(binFolder, $"./standalone-{env}-64.zip");
+        return Path.Combine(binFolder, $"standalone-{env}-64.zip");
     }
 
     public string GetWorkingFolder()

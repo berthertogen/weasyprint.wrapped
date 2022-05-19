@@ -15,13 +15,13 @@ public class CliRunner
 
     public CliRunner(ConfigurationProvider configurationProvider)
     {
-        var cmd = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"python.exe" : "python3";
+        var cmd = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{configurationProvider.GetWorkingFolder()}/python/python.exe" : "python3";
         var workingFolderEnd = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "bin";
         command = Cli
             .Wrap(cmd)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithWorkingDirectory(Path.Combine($"{configurationProvider.GetWorkingFolder()}/python", workingFolderEnd))
+            .WithWorkingDirectory(Path.Combine($"{configurationProvider.GetWorkingFolder()}\\python", workingFolderEnd))
             .WithValidation(CommandResultValidation.None);
         inputFile = Path.Combine(configurationProvider.GetWorkingFolder(), $"{Guid.NewGuid()}.html");
         outputFile = Path.Combine(configurationProvider.GetWorkingFolder(), $"{Guid.NewGuid()}.pdf");
@@ -44,6 +44,13 @@ public class CliRunner
     public async Task<byte[]> ExecuteAsync()
     {
         Result = await this.command.ExecuteAsync();
-        return await File.ReadAllBytesAsync(outputFile);
+        if (File.Exists(outputFile))
+        {
+            return await File.ReadAllBytesAsync(outputFile);
+        }
+        else
+        {
+            return new byte[] { };
+        }
     }
 }

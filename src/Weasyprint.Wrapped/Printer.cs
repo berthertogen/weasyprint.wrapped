@@ -12,7 +12,7 @@ public class Printer
         this.runner = runner;
     }
 
-    public async Task<byte[]> Do(string html)
+    public async Task<byte[]> Print(string html)
     {
         runner.AddInput(html);
         return await runner.ExecuteAsync();
