@@ -50,8 +50,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 0.0.1
-          release_name: Release 0.0.1
+          tag_name: $GITHUB_RUN_ID
+          release_name: Release $GITHUB_RUN_ID
           draft: true
           prerelease: true
       - name: Download assets
@@ -59,7 +59,7 @@ jobs:
         with:
           name: assets
       - name: Create nuget package
-        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID --out nupkgs
+        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
       - name: Push nuget package
         run: dotnet nuget push "Weasyprint.Wrapped.$GITHUB_RUN_ID.nupkg"  --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
