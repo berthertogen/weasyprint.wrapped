@@ -4,7 +4,19 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Weasyprint.Wrapped</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Bert Hertogen</Authors>
+    <Company>Software Solutions Hertogen</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="../../assets/*.*">
+      <Pack>true</Pack>
+      <PackagePath>contentFiles\any\any</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.4.4" />

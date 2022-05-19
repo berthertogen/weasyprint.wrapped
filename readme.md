@@ -2,6 +2,16 @@
 
 TODO
 
+# Create test package
+
+Windows:
+```
+.\build-on-windows.ps1
+Move-Item -Path .\assets\standalone-windows-64.zip -Destination .\src\Weasyprint.Wrapped\contentFiles\standalone-windows-64.zip
+cd .\src\Weasyprint.Wrapped\
+dotnet pack -p:PackageVersion=0.0.1 --output nupkgs
+```
+
 # Building assets
 
 ## Windows (build-on-windows.ps1 does approximately this)

@@ -1,6 +1,7 @@
 assets
-standalone-win-64
-standalone-linux-64
+standalone-*-64
+nupkgs
+Weasyprint.Wrapped.Example/weasyprinter
 
 *.swp
 *.*~

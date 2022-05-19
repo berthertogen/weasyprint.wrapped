@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weasyprint.Wrapped", "Weasy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weasyprint.Wrapped.Tests", "Weasyprint.Wrapped.Tests\Weasyprint.Wrapped.Tests.csproj", "{E3CD7E72-476E-468D-8054-208683E49FCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weasyprint.Wrapped.Example", "Weasyprint.Wrapped.Example\Weasyprint.Wrapped.Example.csproj", "{DF8DF177-1283-41D9-95AA-BD1280ECBC49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{E3CD7E72-476E-468D-8054-208683E49FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3CD7E72-476E-468D-8054-208683E49FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3CD7E72-476E-468D-8054-208683E49FCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8DF177-1283-41D9-95AA-BD1280ECBC49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8DF177-1283-41D9-95AA-BD1280ECBC49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8DF177-1283-41D9-95AA-BD1280ECBC49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8DF177-1283-41D9-95AA-BD1280ECBC49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
