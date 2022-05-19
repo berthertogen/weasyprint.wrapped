@@ -8,6 +8,7 @@
     <Version>0.0.1</Version>
     <Authors>Bert Hertogen</Authors>
     <Company>Software Solutions Hertogen</Company>
+    <RepositoryUrl>https://github.com/berthertogen/weasyprint.wrapped</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
