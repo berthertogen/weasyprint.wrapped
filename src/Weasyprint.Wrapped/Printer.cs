@@ -1,13 +1,13 @@
 namespace Weasyprint.Wrapped;
 public class Printer
 {
-    private readonly ICliRunner runner;
+    private readonly CliRunner runner;
 
-    public Printer(IConfigurationProvider assetProvider)
+    public Printer(ConfigurationProvider assetProvider)
     {
-        this.runner = new CliRunnerWindows(assetProvider);
+        this.runner = new CliRunner(assetProvider);
     }
-    public Printer(ICliRunner runner)
+    public Printer(CliRunner runner)
     {
         this.runner = runner;
     }

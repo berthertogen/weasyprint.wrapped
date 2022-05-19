@@ -8,6 +8,13 @@ jobs:
       - name: Build linux asset
         shell: pwsh
         run: ./build-on-linux.ps1
+      - name: Setup .NET Core SDK 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Test
+        run: dotnet test --verbosity normal
+        working-directory: ./src/Weasyprint.Wrapped.Tests
       - name: Upload linux asset
         uses: actions/upload-artifact@v3
         with:
@@ -25,7 +32,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Test
-        run: dotnet test  --verbosity normal
+        run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
       - name: Upload windows asset
         uses: actions/upload-artifact@v3

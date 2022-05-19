@@ -1,12 +1,14 @@
-﻿namespace Weasyprint.Wrapped;
-public abstract class IConfigurationProvider
+﻿using System.Runtime.InteropServices;
+
+namespace Weasyprint.Wrapped;
+public class ConfigurationProvider
 {
     protected readonly string binFolder;
     protected string workingFolder;
 
-    public IConfigurationProvider() : this("./weasyprinter") { }
+    public ConfigurationProvider() : this("./weasyprinter") { }
 
-    public IConfigurationProvider(string workingFolder)
+    public ConfigurationProvider(string workingFolder)
     {
         binFolder = AppContext.BaseDirectory;
         if (Path.IsPathFullyQualified(workingFolder))
@@ -19,7 +21,10 @@ public abstract class IConfigurationProvider
         }
     }
 
-    public abstract string GetAsset();
+    public virtual string GetAsset() {
+        var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
+        return Path.Combine(binFolder, $"./standalone-{env}-64.zip");
+    }
 
     public string GetWorkingFolder()
         => workingFolder;

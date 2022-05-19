@@ -3,9 +3,9 @@ using System.IO.Compression;
 namespace Weasyprint.Wrapped;
 public class Initializer
 {
-    private readonly IConfigurationProvider assetProvider;
+    private readonly ConfigurationProvider assetProvider;
 
-    public Initializer(IConfigurationProvider assetProvider)
+    public Initializer(ConfigurationProvider assetProvider)
     {
         this.assetProvider = assetProvider;
     }

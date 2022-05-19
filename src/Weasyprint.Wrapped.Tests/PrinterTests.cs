@@ -12,13 +12,13 @@ public class PrinterTests
         if (Directory.Exists("./weasyprinter")) {
             Directory.Delete("./weasyprinter", true);
         }
-        new Initializer(new StubConfigurationProviderWindows()).Do();
+        new Initializer(new StubConfigurationProvider()).Do();
     }
 
     [Fact]
     public async Task Do_RunsCommandUnderWindows()
     {
-        var stub = new StubCliRunnerWindows();
+        var stub = new StubCliRunner();
 
         var result = await new Printer(stub).Do("<html><body><h1>TEST</h1></body></html>");
 
