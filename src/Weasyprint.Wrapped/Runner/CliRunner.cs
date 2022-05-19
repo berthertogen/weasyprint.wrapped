@@ -21,7 +21,7 @@ public class CliRunner
             .Wrap(cmd)
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithWorkingDirectory(Path.Combine($"{configurationProvider.GetWorkingFolder()}\\python", workingFolderEnd))
+            .WithWorkingDirectory(Path.Combine($"{configurationProvider.GetWorkingFolder()}/python", workingFolderEnd))
             .WithValidation(CommandResultValidation.None);
         inputFile = Path.Combine(configurationProvider.GetWorkingFolder(), $"{Guid.NewGuid()}.html");
         outputFile = Path.Combine(configurationProvider.GetWorkingFolder(), $"{Guid.NewGuid()}.pdf");
