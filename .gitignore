@@ -1,6 +1,6 @@
 assets
 standalone-*-64
-nupkgs
+nupkgs/*.nupkg
 Weasyprint.Wrapped.Example/weasyprinter
 
 *.swp
@@ -8,7 +8,6 @@ Weasyprint.Wrapped.Example/weasyprinter
 project.lock.json
 .DS_Store
 *.pyc
-nupkg/
 
 # Visual Studio Code
 .vscode
