@@ -35,7 +35,7 @@ jobs:
       - name: Create nuget package
         run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
-      - name: Create add github source
+      - name: Add github source
         run: dotnet nuget add source --username bert@hertogen.net --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/berthertogen/index.json"
         working-directory: ./src/Weasyprint.Wrapped
       - name: Push nuget package
@@ -58,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: standalone-linux-64.zip
+          asset_path: assets/standalone-linux-64.zip
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
       - name: Upload release asset windows
@@ -68,7 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: standalone-windows-64.zip
+          asset_path: assets/standalone-windows-64.zip
           asset_name: standalone-windows-64.zip
           asset_content_type: application/zip
   
