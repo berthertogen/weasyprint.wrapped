@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: build-test-code-scan
 
 on:
   pull_request:
