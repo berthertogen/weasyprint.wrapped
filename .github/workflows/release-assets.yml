@@ -12,7 +12,7 @@ jobs:
         id: set_version
         with:
           script: |
-            const tag = ${{ github.ref_name }}
+            const tag = '${{ github.ref_name }}'
             const tag_no_v = tag.replace('v', '')
             core.setOutput('tag', tag)
             core.setOutput('tag-no-v', tag_no_v)
