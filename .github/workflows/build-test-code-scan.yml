@@ -1,0 +1,67 @@
+name: "CodeQL"
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp' ]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+    - name: Build
+      run: dotnet build --verbosity normal /p:UseSharedCompilation=false
+      working-directory: ./src/Weasyprint.Wrapped
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+  build-linux-asset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build linux asset
+        shell: pwsh
+        run: ./build-on-linux.ps1
+      - name: Setup .NET Core SDK 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Test
+        run: dotnet test --verbosity normal
+        working-directory: ./src/Weasyprint.Wrapped.Tests
+      - name: Upload linux asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-linux-64.zip
+  build-windows-asset:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build windows asset
+        shell: pwsh
+        run: ./build-on-windows.ps1
+      - name: Setup .NET Core SDK 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Test
+        run: dotnet test --verbosity normal
+        working-directory: ./src/Weasyprint.Wrapped.Tests
+      - name: Upload windows asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-windows-64.zip

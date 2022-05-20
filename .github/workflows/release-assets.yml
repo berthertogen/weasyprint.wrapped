@@ -1,46 +1,9 @@
 name: release-assets
-on: [push]
-env:
-  VERSION: 0.0.2
+on:
+  push:
+    tags:
+      - 'v*'
 jobs:
-  build-linux-asset:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build linux asset
-        shell: pwsh
-        run: ./build-on-linux.ps1
-      - name: Setup .NET Core SDK 6.0.x
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Test
-        run: dotnet test --verbosity normal
-        working-directory: ./src/Weasyprint.Wrapped.Tests
-      - name: Upload linux asset
-        uses: actions/upload-artifact@v3
-        with:
-          name: assets
-          path: ./assets/standalone-linux-64.zip
-  build-windows-asset:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build windows asset
-        shell: pwsh
-        run: ./build-on-windows.ps1
-      - name: Setup .NET Core SDK 6.0.x
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Test
-        run: dotnet test --verbosity normal
-        working-directory: ./src/Weasyprint.Wrapped.Tests
-      - name: Upload windows asset
-        uses: actions/upload-artifact@v3
-        with:
-          name: assets
-          path: ./assets/standalone-windows-64.zip
   release-asset:
     runs-on: ubuntu-latest
     needs: [build-linux-asset, build-windows-asset]
@@ -52,8 +15,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: $VERSION
-          release_name: Release $VERSION
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: true
           prerelease: true
       - name: Download assets
@@ -61,13 +24,13 @@ jobs:
         with:
           name: assets
       - name: Create nuget package
-        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION --output nupkgs
+        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ github.ref }} --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
       - name: Create add github source
         run: dotnet nuget add source --username bert@hertogen.net --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/berthertogen/index.json"
         working-directory: ./src/Weasyprint.Wrapped
       - name: Push nuget package
-        run: dotnet nuget push "Weasyprint.Wrapped.$VERSION.nupkg"  --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
+        run: dotnet nuget push "Weasyprint.Wrapped.${{ github.ref }}.nupkg"  --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
         working-directory: ./src/Weasyprint.Wrapped/nupkgs
       - name: Upload nuget package
         id: upload-nuget-package
@@ -76,8 +39,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "./src/Weasyprint.Wrapped/nupkgs/Weasyprint.Wrapped.$VERSION.nupkg"
-          asset_name: "Weasyprint.Wrapped.$VERSION.nupkg"
+          asset_path: "./src/Weasyprint.Wrapped/nupkgs/Weasyprint.Wrapped.${{ github.ref }}.nupkg"
+          asset_name: "Weasyprint.Wrapped.${{ github.ref }}.nupkg"
           asset_content_type: application/zip
       - name: Upload release asset linux
         id: upload-release-asset-linux
