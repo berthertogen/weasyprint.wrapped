@@ -1,39 +1,60 @@
-# Warning
+# Introduction
+
+Wrapper around the [weasyprint](https://github.com/Kozea/WeasyPrint) library which allows you to print html to a pdf file.
+This package does not require any external software or packages to be installed in order to use weasyprint.
+
+## Warning
 
 This is a large package, try to limit the projects where it will be installed.
-+-200mb zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder.
++-104 MB zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder (for windows).
++-89.7 MB zipped resource (standalone python and weasyprint) which will be unzipped on initialization in the same folder (for linux).
 
-# Usage
+# Getting started
 
-1. Create a config object
+You might want to provide the printer class using your DI Container.
+
+1. Initialize
+This will unzip the needed asset, this is best done during startup procedure.
+The printer will check if the asset is already unzipped, so the process is only done once.
 ```csharp
-var configurationProvider = new ConfigurationProvider();
+new Printer().Initialize();
+```
+2. Print
+```csharp
+new Printer().Print("<html><body><h1>TEST</h1></body></html>");
 ```
 
-2. Initialize the 
-```csharp
-new Initializer(configurationProvider).Do();
-```
+# Extra resources
 
-3. Print using weasyprint
-```csharp
-var runner = new CliRunner(configurationProvider);
-new Printer(runner).Do("<html><body><h1>TEST</h1></body></html>");
-```
+Thanks to all these great repos and the guys maintaining them!!!
 
-# Create test package
+* https://github.com/balbarak/WeasyPrint-netcore
+* https://github.com/Kozea/WeasyPrint
+* https://wiki.python.org/moin/EmbeddedPython
+* https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
+
+# Contribute
+## Create test package and run example
 
 Windows:
 ```
 .\build-on-windows.ps1
-Move-Item -Path .\assets\standalone-windows-64.zip -Destination .\src\Weasyprint.Wrapped\contentFiles\standalone-windows-64.zip
+```
+Linux:
+```
+.\build-on-linux.ps1
+```
+Create package:
+```
 cd .\src\Weasyprint.Wrapped\
-dotnet pack -p:PackageVersion=0.0.1 --output nupkgs
+dotnet pack -p:PackageVersion=0.0.[[NUMBER HERE]] --output nupkgs
 ```
 
-# Building assets
+Update the example project package version (Weasyprint.Wrapped.Example.csproj) and run the example to test it
 
-## Windows (build-on-windows.ps1 does approximately this)
+## Building assets
+
+### Windows (build-on-windows.ps1 does approximately this)
 
 * Download https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases and install to C:\weasyprint.wrapped\standalone-win-64\gtk
 * Download https://github.com/indygreg/python-build-standalone/releases (correct release, eg: cpython-3.10.4+20220502-x86_64-pc-windows-msvc-shared-install_only.tar.gz for windows) and extract to c:\weasyprint.wrapped\standalone-win-64\python
@@ -48,7 +69,7 @@ cd c:\weasyprint.wrapped\standalone-win-64\python
 .\python.exe -m weasyprint --info
 ```
 
-## Linux (build-on-linux.ps1 does approximately this)
+### Linux (build-on-linux.ps1 does approximately this)
 
 * Install powershell on ubuntu (https://docs.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.2)
 * Download https://github.com/indygreg/python-build-standalone/releases (correct release, eg: cpython-3.10.4+20220502-x86_64-unknown-linux-gnu-install_only.tar.gz for Linux) and extract to c:\weasyprint.wrapped\standalone-linux-64\python
@@ -59,16 +80,9 @@ python3 -m pip install weasyprint
 python3 -m weasyprint --info
 ```
 
-## Help
+### Help
 
 * Check PATH in python
 ```
 .\python.exe -c "import os; print(*os.environ['PATH'].split(os.pathsep), sep='\n')"
 ```
-
-# Externals
-
-* https://github.com/balbarak/WeasyPrint-netcore
-* https://github.com/Kozea/WeasyPrint
-* https://wiki.python.org/moin/EmbeddedPython
-* https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases

@@ -4,7 +4,7 @@ namespace Weasyprint.Wrapped.Tests;
 
 public class StubConfigurationProvider : ConfigurationProvider
 {
-    public StubConfigurationProvider() : base("weasyprinter") { }
+    public StubConfigurationProvider() : base() { }
 
     public override string GetAsset()
     {
