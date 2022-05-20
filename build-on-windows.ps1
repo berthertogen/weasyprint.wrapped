@@ -22,6 +22,7 @@ Invoke-Expression "$workingDir/gtk3.exe /setpath=no /dllpath_silent=yes /sideeff
 # Previous command is not blocking but should be done in 30 seconds
 Start-Sleep -Seconds 30
 Move-Item -Path "$workingDir/gtk3/install/*" -Destination "$workingDir/gtk3"
+Remove-Item $workingDir/gtk3.exe -Recurse -Force | Out-Null
 Remove-Item $workingDir/gtk3/install -Recurse -Force | Out-Null
 
 Write-Host "*** Downloading python (https://github.com/indygreg/python-build-standalone)"

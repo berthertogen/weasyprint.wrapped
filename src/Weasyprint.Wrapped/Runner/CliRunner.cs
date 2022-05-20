@@ -28,7 +28,7 @@ public class CliRunner
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var path = $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{configurationProvider.GetWorkingFolder()}/gtk3/bin").FullName}";
+            var path = $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{configurationProvider.GetWorkingFolder()}/gtk3").FullName}";
             command = command.WithEnvironmentVariables(env => env.Set("PATH", path));
         }
     }
