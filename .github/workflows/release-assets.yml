@@ -38,8 +38,11 @@ jobs:
       - name: Add github source
         run: dotnet nuget add source --username bert@hertogen.net --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/berthertogen/index.json"
         working-directory: ./src/Weasyprint.Wrapped
-      - name: Push nuget package
+      - name: Push nuget package to github
         run: dotnet nuget push "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"  --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
+        working-directory: ./src/Weasyprint.Wrapped/nupkgs
+      - name: Push nuget package to nuget
+        run: dotnet nuget push "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"  --api-key "${{ secrets.NUGET_TOKEN }}" --source https://api.nuget.org/v3/index.json
         working-directory: ./src/Weasyprint.Wrapped/nupkgs
       - name: Upload nuget package
         id: upload-nuget-package
