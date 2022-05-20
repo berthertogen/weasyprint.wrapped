@@ -47,11 +47,11 @@ public class Printer
     {
         var inputFile = Path.Combine(workingFolder, $"{Guid.NewGuid()}.html");
         var outputFile = Path.Combine(workingFolder, $"{Guid.NewGuid()}.pdf");
-        await File.WriteAllTextAsync(inputFile, html);
+        File.WriteAllText(inputFile, html);
         command = command.WithArguments($"-m weasyprint {inputFile} {outputFile} -e utf8");
         var result = await this.command.ExecuteAsync();
         return new PrintResult(
-            File.Exists(outputFile) ? await File.ReadAllBytesAsync(outputFile) : Array.Empty<byte>(),
+            File.Exists(outputFile) ? File.ReadAllBytes(outputFile) : Array.Empty<byte>(),
             stdErrBuffer.ToString(),
             stdOutBuffer.ToString(),
             result.RunTime,

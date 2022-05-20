@@ -6,12 +6,12 @@ public class ConfigurationProvider
     protected readonly string binFolder;
     protected string workingFolder;
 
-    public ConfigurationProvider() : this("weasyprinter") { }
+    public ConfigurationProvider() : this("weasyprinter", false) { }
 
-    public ConfigurationProvider(string workingFolder)
+    public ConfigurationProvider(string workingFolder, bool isAbsolute)
     {
         binFolder = AppContext.BaseDirectory;
-        if (Path.IsPathFullyQualified(workingFolder))
+        if (isAbsolute)
         {
             this.workingFolder = workingFolder;
         }
