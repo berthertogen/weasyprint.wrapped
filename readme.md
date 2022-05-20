@@ -5,31 +5,36 @@ This is a large package, try to limit the projects where it will be installed.
 
 # Usage
 
-1. Create a config object
+You might want to provide the printer class using your DI Container.
+
+1. Initialize
+This will unzip the needed asset, this is best done during startup procedure.
+The printer will check if the asset is already unzipped, so the process is only done once.
 ```csharp
-var configurationProvider = new ConfigurationProvider();
+new Printer().Initialize();
+```
+2. Print
+```csharp
+new Printer().Print("<html><body><h1>TEST</h1></body></html>");
 ```
 
-2. Initialize the 
-```csharp
-new Initializer(configurationProvider).Do();
-```
-
-3. Print using weasyprint
-```csharp
-var runner = new CliRunner(configurationProvider);
-new Printer(runner).Do("<html><body><h1>TEST</h1></body></html>");
-```
-
-# Create test package
+# Create test package and run example
 
 Windows:
 ```
 .\build-on-windows.ps1
-Move-Item -Path .\assets\standalone-windows-64.zip -Destination .\src\Weasyprint.Wrapped\contentFiles\standalone-windows-64.zip
-cd .\src\Weasyprint.Wrapped\
-dotnet pack -p:PackageVersion=0.0.1 --output nupkgs
 ```
+Linux:
+```
+.\build-on-linux.ps1
+```
+Create package:
+```
+cd .\src\Weasyprint.Wrapped\
+dotnet pack -p:PackageVersion=0.0.[[NUMBER HERE]] --output nupkgs
+```
+
+Update the example project package version (Weasyprint.Wrapped.Example.csproj) and run the example to test it
 
 # Building assets
 

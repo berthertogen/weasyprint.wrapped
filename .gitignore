@@ -1,6 +1,6 @@
 assets
 standalone-*-64
-nupkgs/*.nupkg
+*.nupkg
 Weasyprint.Wrapped.Example/weasyprinter
 
 *.swp
