@@ -12,7 +12,7 @@ jobs:
         id: set_version
         with:
           script: |
-            const tag = ${{ github.ref_name }}
+            const tag = '${{ github.ref_name }}'
             const tag_no_v = tag.replace('v', '')
             core.setOutput('tag', tag)
             core.setOutput('tag-no-v', tag_no_v)
@@ -23,8 +23,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.set_version.outputs.tag-no-v }}
-          release_name: Release ${{steps.set_version.outputs.tag-no-v}}
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
           draft: true
           prerelease: true
       - name: Download artifact
@@ -35,11 +35,14 @@ jobs:
       - name: Create nuget package
         run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
-      - name: Create add github source
+      - name: Add github source
         run: dotnet nuget add source --username bert@hertogen.net --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/berthertogen/index.json"
         working-directory: ./src/Weasyprint.Wrapped
-      - name: Push nuget package
+      - name: Push nuget package to github
         run: dotnet nuget push "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"  --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
+        working-directory: ./src/Weasyprint.Wrapped/nupkgs
+      - name: Push nuget package to nuget
+        run: dotnet nuget push "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"  --api-key "${{ secrets.NUGET_TOKEN }}" --source https://api.nuget.org/v3/index.json
         working-directory: ./src/Weasyprint.Wrapped/nupkgs
       - name: Upload nuget package
         id: upload-nuget-package
@@ -58,7 +61,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: standalone-linux-64.zip
+          asset_path: assets/standalone-linux-64.zip
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
       - name: Upload release asset windows
@@ -68,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: standalone-windows-64.zip
+          asset_path: assets/standalone-windows-64.zip
           asset_name: standalone-windows-64.zip
           asset_content_type: application/zip
   

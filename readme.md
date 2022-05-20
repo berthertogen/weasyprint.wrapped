@@ -1,6 +1,25 @@
+# Warning
+
+This is a large package, try to limit the projects where it will be installed.
++-200mb zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder.
+
 # Usage
 
-TODO
+1. Create a config object
+```csharp
+var configurationProvider = new ConfigurationProvider();
+```
+
+2. Initialize the 
+```csharp
+new Initializer(configurationProvider).Do();
+```
+
+3. Print using weasyprint
+```csharp
+var runner = new CliRunner(configurationProvider);
+new Printer(runner).Do("<html><body><h1>TEST</h1></body></html>");
+```
 
 # Create test package
 
