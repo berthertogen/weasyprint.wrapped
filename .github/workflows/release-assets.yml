@@ -76,8 +76,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/Weasyprint.Wrapped/nupkgs/Weasyprint.Wrapped.$VERSION.nupkg
-          asset_name: Weasyprint.Wrapped.$VERSION.nupkg
+          asset_path: "./src/Weasyprint.Wrapped/nupkgs/Weasyprint.Wrapped.$VERSION.nupkg"
+          asset_name: "Weasyprint.Wrapped.$VERSION.nupkg"
           asset_content_type: application/zip
       - name: Upload release asset linux
         id: upload-release-asset-linux

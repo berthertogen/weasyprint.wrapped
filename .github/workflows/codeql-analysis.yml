@@ -56,9 +56,8 @@ jobs:
     #   echo "Run, Build Application using script"
     #   ./location_of_script_within_repo/buildscript.sh
 
-
     - name: Build
-      run: dotnet build --verbosity normal
+      run: dotnet build --verbosity normal /p:UseSharedCompilation=false
       working-directory: ./src/Weasyprint.Wrapped
 
     - name: Perform CodeQL Analysis
