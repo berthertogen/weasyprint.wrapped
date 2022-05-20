@@ -19,8 +19,8 @@ $assets = Resolve-Path -Path "./assets";
 Write-Host "*** Downloading gtk3 (https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer)"
 Invoke-WebRequest -Uri "https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/download/2022-01-04/gtk3-runtime-3.24.31-2022-01-04-ts-win64.exe" -OutFile "$workingDir/gtk3.exe"
 Invoke-Expression "$workingDir/gtk3.exe /setpath=no /dllpath_silent=yes /sideeffects=no /dllpath=root /translations=no /removeold=no /S /D=$workingDir\gtk3\install\"
-# Previous command is not blocking but should be done in 10 seconds
-Start-Sleep -Seconds 10
+# Previous command is not blocking but should be done in 30 seconds
+Start-Sleep -Seconds 30
 Move-Item -Path "$workingDir/gtk3/install/*" -Destination "$workingDir/gtk3"
 Remove-Item $workingDir/gtk3/install -Recurse -Force | Out-Null
 
