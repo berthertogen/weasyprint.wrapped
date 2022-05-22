@@ -32,10 +32,14 @@ Remove-Item "$workingDir/python.tar.gz" -Recurse -Force | Out-Null
 
 Set-Location  "$workingDir/python"
 Write-Host "*** Installing weasyprint"
-Invoke-Expression ".\python.exe -m pip install weasyprint"
+Invoke-Expression ".\python.exe -m pip install weasyprint==55"
 $Env:PATH += ";$workingDir/gtk3"
 Write-Host "*** Testing weasyprint"
 Invoke-Expression ".\python.exe -m weasyprint --info"
+$version = Invoke-Expression ".\python.exe -m weasyprint --version"
+$versionCleared = $version.Replace(' ','').ToLower();
+$versionFile = "version-$versionCleared"
+New-Item -Path "$workingDir/$versionFile"
 Set-Location  "../../"
 
 Write-Host "*** Create archive $assets/standalone-windows-64.zip"
