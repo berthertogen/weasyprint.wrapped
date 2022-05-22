@@ -19,6 +19,11 @@ public class Printer
 
     public void Initialize()
     {
+        var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
+        if (File.Exists(Path.Combine(workingFolder, version)))
+        {
+            return;
+        }
         if (Directory.Exists(workingFolder))
         {
             Directory.Delete(workingFolder, true);
@@ -55,7 +60,9 @@ public class Printer
                 .Wrap($"{workingFolder}/python/python.exe")
                 .WithWorkingDirectory($"{workingFolder}/python")
                 .WithEnvironmentVariables(env => env.Set("PATH", $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{workingFolder}/gtk3").FullName}"));
-        } else {
+        }
+        else
+        {
             command = Cli
                 .Wrap("python3")
                 .WithWorkingDirectory($"{workingFolder}/python/bin");
