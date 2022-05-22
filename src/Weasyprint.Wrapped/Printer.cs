@@ -6,9 +6,6 @@ using CliWrap;
 namespace Weasyprint.Wrapped;
 public class Printer
 {
-    protected StringBuilder stdOutBuffer = new StringBuilder();
-    protected StringBuilder stdErrBuffer = new StringBuilder();
-    protected Command command;
     private readonly string workingFolder;
     private readonly string asset;
 
@@ -18,19 +15,6 @@ public class Printer
     {
         workingFolder = configurationProvider.GetWorkingFolder();
         asset = configurationProvider.GetAsset();
-        var cmd = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{workingFolder}/python/python.exe" : "python3";
-        var workingFolderEnd = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "" : "bin";
-        command = Cli
-            .Wrap(cmd)
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithWorkingDirectory(Path.Combine($"{workingFolder}/python", workingFolderEnd))
-            .WithValidation(CommandResultValidation.None);
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            var path = $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{workingFolder}/gtk3").FullName}";
-            command = command.WithEnvironmentVariables(env => env.Set("PATH", path));
-        }
     }
 
     public void Initialize()
@@ -45,18 +29,38 @@ public class Printer
 
     public async Task<PrintResult> Print(string html)
     {
-        var inputFile = Path.Combine(workingFolder, $"{Guid.NewGuid()}.html");
-        var outputFile = Path.Combine(workingFolder, $"{Guid.NewGuid()}.pdf");
-        File.WriteAllText(inputFile, html);
-        command = command.WithArguments($"-m weasyprint {inputFile} {outputFile} -e utf8");
-        var result = await this.command.ExecuteAsync();
+        using var outputStream = new MemoryStream();
+        var stdErrBuffer = new StringBuilder();
+        var result = await BuildOsSpecificCommand()
+            .WithArguments($"-m weasyprint - - -e utf8")
+            .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
+            .WithStandardInputPipe(PipeSource.FromString(html))
+            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteAsync();
         return new PrintResult(
-            File.Exists(outputFile) ? File.ReadAllBytes(outputFile) : Array.Empty<byte>(),
+            outputStream.ToArray(),
             stdErrBuffer.ToString(),
-            stdOutBuffer.ToString(),
             result.RunTime,
-            result.ExitCode,
-            outputFile
+            result.ExitCode
         );
     }
+
+    private Command BuildOsSpecificCommand()
+    {
+        Command command;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            command = Cli
+                .Wrap($"{workingFolder}/python/python.exe")
+                .WithWorkingDirectory($"{workingFolder}/python")
+                .WithEnvironmentVariables(env => env.Set("PATH", $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{workingFolder}/gtk3").FullName}"));
+        } else {
+            command = Cli
+                .Wrap("python3")
+                .WithWorkingDirectory($"{workingFolder}/python/bin");
+        }
+        return command;
+    }
+
 }

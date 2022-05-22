@@ -2,6 +2,7 @@ assets
 standalone-*-64
 *.nupkg
 Weasyprint.Wrapped.Example/weasyprinter
+Print_RunsCommand_Result_Actual.pdf
 
 *.swp
 *.*~
