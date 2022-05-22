@@ -26,6 +26,10 @@ Write-Host "*** Installing weasyprint"
 Invoke-Expression "python3 -m pip install weasyprint"
 Write-Host "*** Testing weasyprint"
 Invoke-Expression "python3 -m weasyprint --info"
+$version = Invoke-Expression "python3 -m weasyprint --version"
+$versionCleared = $version.Replace(' ','').ToLower();
+$versionFile = "version-$versionCleared"
+New-Item -Path "$workingDir/$versionFile"
 Set-Location  "../../../"
 
 Write-Host "*** Create archive $assets/standalone-linux-64.zip"

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -45,7 +46,8 @@ public class PrinterTests
         Assert.Equal(0, result.ExitCode);
         
         var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-        var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_Result_Expected.pdf"));
+        var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
+        var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot,$"Expected/{filename}"));
         File.WriteAllBytes(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_Result_Actual.pdf"), result.Bytes);
 
         // Unable to compare the bytes array, there is a deviation somewhere in the generated pdf.

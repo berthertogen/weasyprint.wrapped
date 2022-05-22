@@ -36,6 +36,10 @@ Invoke-Expression ".\python.exe -m pip install weasyprint"
 $Env:PATH += ";$workingDir/gtk3"
 Write-Host "*** Testing weasyprint"
 Invoke-Expression ".\python.exe -m weasyprint --info"
+$version = Invoke-Expression ".\python.exe -m weasyprint --version"
+$versionCleared = $version.Replace(' ','').ToLower();
+$versionFile = "version-$versionCleared"
+New-Item -Path "$workingDir/$versionFile"
 Set-Location  "../../"
 
 Write-Host "*** Create archive $assets/standalone-windows-64.zip"
