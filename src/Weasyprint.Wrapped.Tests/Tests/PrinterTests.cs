@@ -106,6 +106,19 @@ public class PrinterTests
         Assert.InRange(result.Bytes.Length, expectedOutputBytes.Length - 5, expectedOutputBytes.Length + 5);
     }
 
+    [Fact]
+    public async Task Print_RunsCommand_SpecialCharacters()
+    {
+        var printer = GetPrinter();
+        printer.Initialize();
+
+        var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+        var html = File.ReadAllText(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
+        var result = await printer.Print(html);
+
+        File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"), result.Bytes);
+    }
+
     private static Printer GetPrinter()
     {
         var config = new ConfigurationProvider("../../../../../assets/", false, "weasyprinter", false);

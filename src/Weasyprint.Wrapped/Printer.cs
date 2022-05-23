@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
 using CliWrap;
+using CliWrap.Buffered;
 
 namespace Weasyprint.Wrapped;
 public class Printer
@@ -37,12 +38,12 @@ public class Printer
         using var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - -e utf8")
+            .WithArguments($"-m weasyprint - - --encoding utf8")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
-            .WithStandardInputPipe(PipeSource.FromString(html))
+            .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
-            .ExecuteAsync();
+            .ExecuteBufferedAsync(Encoding.UTF8);
         return new PrintResult(
             outputStream.ToArray(),
             stdErrBuffer.ToString(),

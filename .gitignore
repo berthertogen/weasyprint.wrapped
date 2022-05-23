@@ -3,6 +3,8 @@ standalone-*-64
 *.nupkg
 Weasyprint.Wrapped.Example/weasyprinter
 Print_RunsCommand_Result_Actual.pdf
+Print_RunsCommand_SpecialCharacters_Output.pdf
+result.pdf
 
 *.swp
 *.*~
