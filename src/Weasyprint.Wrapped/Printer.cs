@@ -65,7 +65,7 @@ public class Printer
         else
         {
             command = Cli
-                .Wrap("python3")
+                .Wrap("./python3")
                 .WithWorkingDirectory($"{workingFolder}/python/bin");
         }
         return command;
