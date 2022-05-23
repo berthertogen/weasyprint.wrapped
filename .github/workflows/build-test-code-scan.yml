@@ -52,7 +52,7 @@ jobs:
           name: standalone-linux-64.zip
           path: ./assets/standalone-linux-64.zip
   test-assets:
-    needs: build-assets
+    needs: [build-assets-windows, build-assets-linux]
     strategy:
         matrix:
           os: [ubuntu-latest, windows-latest]
