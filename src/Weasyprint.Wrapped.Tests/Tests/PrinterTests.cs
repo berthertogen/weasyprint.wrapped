@@ -103,7 +103,7 @@ public class PrinterTests
         // Unable to compare the bytes array, there is a deviation somewhere in the generated pdf.
         // result.Bytes.Should().BeEquivalentTo(expectedOutputBytes);
         // the length seems to be relativly stable but not 100% equal, hence the range.
-        Assert.InRange(result.Bytes.Length, expectedOutputBytes.Length - 5, expectedOutputBytes.Length + 5);
+        Assert.InRange(result.Bytes.Length, expectedOutputBytes.Length - 200, expectedOutputBytes.Length + 200);
     }
 
     [Fact]
