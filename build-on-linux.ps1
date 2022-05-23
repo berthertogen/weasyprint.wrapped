@@ -37,6 +37,7 @@ chmod -R 777 ./python
 source ./python/bin/venv/bin/activate
 ./python/bin/venv/bin/weasyprint - - --encoding utf8
 "
+Invoke-Expression "/bin/bash sed -i -e 's/\r$//' $workingDir/print.sh"
 Invoke-Expression "chmod -R 777 $workingDir"
 Set-Location  "../../../"
 
