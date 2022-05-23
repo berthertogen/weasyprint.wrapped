@@ -33,7 +33,7 @@ versionCleared="${version// /}"
 versionClearedLowered=$(echo $versionCleared | tr '[:upper:]' '[:lower:]')
 echo "*** Version=$versionClearedLowered"
 cd ..
-touch $versionClearedLowered
+touch "version-$versionClearedLowered"
 echo "chmod -R 777 python
 cd python
 source venv/bin/activate
@@ -43,5 +43,6 @@ venv/bin/weasyprint - - --encoding utf8" >> print.sh
 cd ../
 ls
 
+cd $workingDir
 echo "*** Create archive $assets/standalone-linux-64.zip"
-zip -9 -y -r $assets/standalone-linux-64.zip $workingDir/*
+zip -9 -y -r "../$assets/standalone-linux-64.zip" .
