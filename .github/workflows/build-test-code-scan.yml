@@ -27,34 +27,30 @@ jobs:
       working-directory: ./src/Weasyprint.Wrapped
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
-  build-assets:
-    strategy:
-        matrix:
-          os: [ubuntu-latest, windows-latest]
-          include:
-          - osname: windows
-            os: windows-latest
-          - scriptname: build-on-windows.ps1
-            os: windows-latest
-          - shell: pwsh
-            os: windows-latest
-          - osname: linux
-            os: ubuntu-latest
-          - scriptname: build-on-linux.sh
-            os: ubuntu-latest
-          - shell: bash
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+  build-assets-windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - name: Build asset
-        shell: ${{ matrix.shell }}
-        run: ./${{ matrix.scriptname }}
+        shell: pwsh
+        run: ./build-on-windows.ps1
       - name: Upload asset
         uses: actions/upload-artifact@v3
         with:
-          name: standalone-${{ matrix.osname }}-64.zip
-          path: ./assets/standalone-${{ matrix.osname }}-64.zip
+          name: standalone-windows-64.zip
+          path: ./assets/standalone-windows-64.zip
+  build-assets-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build asset
+        shell: bash
+        run: ./build-on-linux.sh
+      - name: Upload asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: standalone-linux-64.zip
+          path: ./assets/standalone-linux-64.zip
   test-assets:
     needs: build-assets
     strategy:
