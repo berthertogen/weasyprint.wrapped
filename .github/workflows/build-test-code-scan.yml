@@ -48,6 +48,7 @@ jobs:
           name: assets
           path: ./assets/standalone-${{ matrix.osname }}-64.zip
   test-assets:
+    needs: build-assets
     strategy:
         matrix:
           os: [ubuntu-latest, windows-latest]
