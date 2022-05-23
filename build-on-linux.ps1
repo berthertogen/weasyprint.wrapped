@@ -23,14 +23,19 @@ Remove-Item "$workingDir/python.tar.gz" -Recurse -Force | Out-Null
 
 Set-Location  "$workingDir/python/bin"
 Write-Host "*** Installing weasyprint"
-Invoke-Expression "./python3 -m pip install weasyprint==55 -t ../lib/"
-$Env:PYTHONPATH += ":$workingDir/python/lib"
-Write-Host "*** Testing weasyprint"
-Invoke-Expression "./python3 -m weasyprint --info"
-$version = Invoke-Expression "./python3 -m weasyprint --version"
+Invoke-Expression "./python3 -m venv venv"
+Invoke-Expression "/bin/bash source $workingDir/python/venv/bin/activate"
+Invoke-Expression "pip install weasyprint"
+Invoke-Expression "weasyprint --info"
+$version = Invoke-Expression "weasyprint --version"
 $versionCleared = $version.Replace(' ','').ToLower();
 $versionFile = "version-$versionCleared"
 New-Item -Path "$workingDir/$versionFile"
+New-Item -Path "$workingDir/print.sh"
+Add-Content -Path "$workingDir/print.sh" -Value "
+source ./python/bin/venv/bin/activate
+weasyprint - - --encoding utf8
+"
 Invoke-Expression "chmod -R 777 $workingDir"
 Set-Location  "../../../"
 
