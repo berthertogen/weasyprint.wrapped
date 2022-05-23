@@ -91,7 +91,7 @@ public class PrinterTests
         printer.Initialize();
         var result = await printer.Print("<html><body><h1>TEST</h1></body></html>");
 
-        Assert.False(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
+        Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
 
