@@ -42,15 +42,30 @@ jobs:
       - name: Build asset
         shell: pwsh
         run: ./build-on-${{ matrix.osname }}.ps1
-      - name: Setup .NET Core SDK 6.0.x
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Test
-        run: dotnet test --verbosity normal
-        working-directory: ./src/Weasyprint.Wrapped.Tests
       - name: Upload asset
         uses: actions/upload-artifact@v3
         with:
           name: assets
           path: ./assets/standalone-${{ matrix.osname }}-64.zip
+  test-assets:
+    strategy:
+        matrix:
+          os: [ubuntu-latest, windows-latest]
+          include:
+          - osname: windows
+            os: windows-latest
+          - osname: linux
+            os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK 6.0.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - uses: actions/download-artifact@v3
+        with:
+          name: assets
+      - name: Test
+        run: dotnet test --verbosity normal
+        working-directory: ./src/Weasyprint.Wrapped.Tests
