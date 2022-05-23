@@ -34,14 +34,22 @@ jobs:
           include:
           - osname: windows
             os: windows-latest
+          - scriptname: build-on-windows.ps1
+            os: windows-latest
+          - shell: pwsh
+            os: windows-latest
           - osname: linux
+            os: ubuntu-latest
+          - scriptname: build-on-linux.sh
+            os: ubuntu-latest
+          - shell: bash
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: Build asset
-        shell: pwsh
-        run: ./build-on-${{ matrix.osname }}.ps1
+        shell: ${{ matrix.shell }}
+        run: ./${{ matrix.scriptname }}
       - name: Upload asset
         uses: actions/upload-artifact@v3
         with:
