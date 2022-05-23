@@ -91,9 +91,9 @@ public class PrinterTests
         printer.Initialize();
         var result = await printer.Print("<html><body><h1>TEST</h1></body></html>");
 
-        Assert.False(result.HasError);
         Assert.Empty(result.Error);
         Assert.Equal(0, result.ExitCode);
+        Assert.False(result.HasError);
 
         var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
         var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
