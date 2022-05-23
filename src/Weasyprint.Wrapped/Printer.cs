@@ -66,7 +66,8 @@ public class Printer
         {
             command = Cli
                 .Wrap("./python3")
-                .WithWorkingDirectory($"{workingFolder}/python/bin");
+                .WithWorkingDirectory($"{workingFolder}/python/bin")
+                .WithEnvironmentVariables(env => env.Set("PYTHONPATH", $"{new FileInfo($"{workingFolder}/python/lib").FullName}"));
         }
         return command;
     }

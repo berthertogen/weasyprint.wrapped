@@ -21,16 +21,16 @@ public class PrinterTests
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder()
+    public async Task Initialize_UnzipsAssetToFolder()
     {
-        GetPrinter().Initialize();
+       GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.True(Directory.Exists("./weasyprinter/python"));
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_DeletesFolderIfExistsAndNoVersionInfo()
+    public async Task Initialize_UnzipsAssetToFolder_DeletesFolderIfExistsAndNoVersionInfo()
     {
         Directory.CreateDirectory("./weasyprinter");
 
@@ -46,7 +46,7 @@ public class PrinterTests
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_DeletesFolderIfVersionIsDifferent()
+    public async Task Initialize_UnzipsAssetToFolder_DeletesFolderIfVersionIsDifferent()
     {
         Directory.CreateDirectory("./weasyprinter");
         var fileStream = File.Create($"./weasyprinter/version-somethingdifferent");
@@ -64,7 +64,7 @@ public class PrinterTests
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_LeaveFolderIfVersionIsSame()
+    public async Task Initialize_UnzipsAssetToFolder_LeaveFolderIfVersionIsSame()
     {
         Directory.CreateDirectory("./weasyprinter");
         var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
