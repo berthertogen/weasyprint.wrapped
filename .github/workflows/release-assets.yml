@@ -41,7 +41,7 @@ jobs:
           rm version-*
           touch version-${{ steps.set_version.outputs.tag-no-v }}
           zip -y -r ../standalone-linux-64.zip .
-          cd ../standalone-windows-64.zip
+          cd ../../standalone-windows-64.zip
           unzip standalone-windows-64.zip -d standalone-windows-64
           rm standalone-windows-64.zip
           cd standalone-windows-64
