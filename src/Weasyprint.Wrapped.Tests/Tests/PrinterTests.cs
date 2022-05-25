@@ -21,32 +21,31 @@ public class PrinterTests
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder()
+    public async Task Initialize_UnzipsAssetToFolder()
     {
-       GetPrinter().Initialize();
+       await GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.True(Directory.Exists("./weasyprinter/python"));
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_DeletesFolderIfExistsAndNoVersionInfo()
+    public async Task Initialize_UnzipsAssetToFolder_DeletesFolderIfExistsAndNoVersionInfo()
     {
         Directory.CreateDirectory("./weasyprinter");
 
         var timeBeforeAction = DateTime.Now;
         var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
+        await GetPrinter().Initialize();
         actiontimer.Stop();
 
-        Assert.True(actiontimer.ElapsedMilliseconds > 1000, "Should take longer then a second, we're extracting everything");
         var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
         var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
         Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_DeletesFolderIfVersionIsDifferent()
+    public async Task Initialize_UnzipsAssetToFolder_DeletesFolderIfVersionIsDifferent()
     {
         Directory.CreateDirectory("./weasyprinter");
         var fileStream = File.Create($"./weasyprinter/version-somethingdifferent");
@@ -54,17 +53,16 @@ public class PrinterTests
 
         var timeBeforeAction = DateTime.Now;
         var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
+        await GetPrinter().Initialize();
         actiontimer.Stop();
 
-        Assert.True(actiontimer.ElapsedMilliseconds > 1000, "Should take longer then a second, we're extracting everything");
         var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
         var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
         Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
     }
 
     [Fact]
-    public void Initialize_UnzipsAssetToFolder_LeaveFolderIfVersionIsSame()
+    public async Task Initialize_UnzipsAssetToFolder_LeaveFolderIfVersionIsSame()
     {
         Directory.CreateDirectory("./weasyprinter");
         var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
@@ -75,7 +73,7 @@ public class PrinterTests
 
         var timeBeforeAction = DateTime.Now;
         var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
+        await GetPrinter().Initialize();
         actiontimer.Stop();
 
         Assert.True(actiontimer.ElapsedMilliseconds < 1000);
@@ -85,10 +83,11 @@ public class PrinterTests
     }
 
     [Fact]
-    public async Task Print_RunsCommand()
+    public async Task Print_RunsCommand_Simple()
     {
         var printer = GetPrinter();
-        printer.Initialize();
+        await printer.Initialize();
+
         var result = await printer.Print("<html><body><h1>TEST</h1></body></html>");
 
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
@@ -110,13 +109,17 @@ public class PrinterTests
     public async Task Print_RunsCommand_SpecialCharacters()
     {
         var printer = GetPrinter();
-        printer.Initialize();
+        await printer.Initialize();
 
         var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
         var html = File.ReadAllText(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
         var result = await printer.Print(html);
 
         File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"), result.Bytes);
+
+        Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
+        Assert.Equal(0, result.ExitCode);
+        Assert.False(result.HasError);
     }
 
     private static Printer GetPrinter()
