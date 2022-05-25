@@ -34,15 +34,12 @@ jobs:
           workflow_conclusion: success
       - name: Add version files
         run: |
-          unzip standalone-linux-64.zip -d standalone-linux-64
-          rm standalone-linux-64/version-*
-          touch standalone-linux-64/version-${{ steps.set_version.outputs.tag-no-v }}
-          rm standalone-linux-64.zip
-          cd standalone-linux-64
-          zip -y -r ../standalone-linux-64.zip .
-      # zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
-      # zip -d standalone-windows-64.zip version-*
-      # zip -ur standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          zip --version
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-linux-64.zip/standalone-linux-64.zip version-*
+          zip -ur standalone-linux-64.zip/standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-windows-64.zip/standalone-windows-64.zip version-*
+          zip -ur standalone-windows-64.zip/standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
       # - name: Create nuget package
       #   run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
       #   working-directory: ./src/Weasyprint.Wrapped
