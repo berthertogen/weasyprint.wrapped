@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: standalone-windows-64.zip
-          path: ./assets/standalone-windows-64.zip
+          path: ./assets
   build-assets-linux:
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: standalone-linux-64.zip
-          path: ./assets/standalone-linux-64.zip
+          path: ./assets
   test-assets:
     needs: [build-assets-windows, build-assets-linux]
     strategy:
