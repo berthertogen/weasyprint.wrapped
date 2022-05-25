@@ -34,6 +34,7 @@ jobs:
           workflow_conclusion: success
       - name: Add version files
         run: |
+          tree -L 3
           zip --version
           touch version-${{ steps.set_version.outputs.tag-no-v }}
           zip -d standalone-linux-64.zip/standalone-linux-64.zip version-*
