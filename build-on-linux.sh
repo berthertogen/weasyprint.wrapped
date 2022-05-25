@@ -29,4 +29,4 @@ echo "cd python/bin/
 ./python3.10 -m weasyprint - - --encoding utf8" >> print.sh
 
 echo "*** Create archive $assets/standalone-linux-64.zip"
-zip -9 -y -r "../$assets/standalone-linux-64.zip" .
+zip -y -r "../$assets/standalone-linux-64.zip" .
