@@ -35,9 +35,11 @@ jobs:
       - name: Add version files
         run: |
           cd standalone-linux-64.zip
-          touch version-${{ steps.set_version.outputs.tag-no-v }}
+          unzip standalone-linux-64.zip -d standalone-linux-64
           tree -L 3
-          unzip standalone-linux-64.zip
+          cd standalone-linux-64
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -y -r ../standalone-linux-64.zip .
           zip -d standalone-linux-64.zip version-*
         # zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
         # cd ../standalone-windows-64.zip
