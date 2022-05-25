@@ -17,11 +17,11 @@ You might want to provide the printer class using your DI Container.
 This will unzip the needed asset, this is best done during startup procedure.
 The printer will check if the asset is already unzipped, so the process is only done once (or when the package is upgraded and the weasyprint version changed).
 ```csharp
-new Printer().Initialize();
+await new Printer().Initialize();
 ```
 2. Print
 ```csharp
-new Printer().Print("<html><body><h1>TEST</h1></body></html>");
+await new Printer().Print("<html><body><h1>TEST</h1></body></html>");
 ```
 
 # Extra resources

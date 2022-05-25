@@ -25,7 +25,8 @@ versionClearedLowered=weasyprint==55
 echo "*** Version=$versionClearedLowered"
 touch "version-$versionClearedLowered"
 echo "cd python/bin/
-python3 -m pip install $versionClearedLowered" >> init.sh
+./python3.10 -m pip install weasyprint==55 2> /dev/null
+./python3.10 -m weasyprint - - --encoding utf8" >> print.sh
 
 echo "*** Create archive $assets/standalone-linux-64.zip"
 zip -9 -y -r "../$assets/standalone-linux-64.zip" .
