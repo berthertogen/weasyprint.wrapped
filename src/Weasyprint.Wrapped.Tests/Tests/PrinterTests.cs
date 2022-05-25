@@ -23,7 +23,7 @@ public class PrinterTests
     [Fact]
     public async Task Initialize_UnzipsAssetToFolder()
     {
-       GetPrinter().Initialize();
+       await GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.True(Directory.Exists("./weasyprinter/python"));
@@ -35,11 +35,8 @@ public class PrinterTests
         Directory.CreateDirectory("./weasyprinter");
 
         var timeBeforeAction = DateTime.Now;
-        var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
-        actiontimer.Stop();
+        await GetPrinter().Initialize();
 
-        Assert.True(actiontimer.ElapsedMilliseconds > 1000, "Should take longer then a second, we're extracting everything");
         var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
         var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
         Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
@@ -53,11 +50,8 @@ public class PrinterTests
         fileStream.Close();
 
         var timeBeforeAction = DateTime.Now;
-        var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
-        actiontimer.Stop();
+        await GetPrinter().Initialize();
 
-        Assert.True(actiontimer.ElapsedMilliseconds > 1000, "Should take longer then a second, we're extracting everything");
         var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
         var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
         Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
@@ -74,21 +68,19 @@ public class PrinterTests
         fileStream.Close();
 
         var timeBeforeAction = DateTime.Now;
-        var actiontimer = Stopwatch.StartNew();
-        GetPrinter().Initialize();
-        actiontimer.Stop();
+        await GetPrinter().Initialize();
 
-        Assert.True(actiontimer.ElapsedMilliseconds < 1000);
         var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
         var isCreatedBefore = creationTime.TimeOfDay < timeBeforeAction.TimeOfDay;
         Assert.True(isCreatedBefore, $"Should be created ({creationTime.ToLongTimeString()}) before {timeBeforeAction.ToLongTimeString()}");
     }
 
     [Fact]
-    public async Task Print_RunsCommand()
+    public async Task Print_RunsCommand_Simple()
     {
         var printer = GetPrinter();
-        printer.Initialize();
+        await printer.Initialize();
+
         var result = await printer.Print("<html><body><h1>TEST</h1></body></html>");
 
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
@@ -99,24 +91,25 @@ public class PrinterTests
         var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
         var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot, $"Expected/{filename}"));
         File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_Result_Actual.pdf"), result.Bytes);
-
-        // Unable to compare the bytes array, there is a deviation somewhere in the generated pdf.
-        // result.Bytes.Should().BeEquivalentTo(expectedOutputBytes);
-        // the length seems to be relativly stable but not 100% equal, hence the range.
-        Assert.InRange(result.Bytes.Length, expectedOutputBytes.Length - 200, expectedOutputBytes.Length + 200);
+        Assert.True(result.Bytes.Length > 0);
     }
 
     [Fact]
     public async Task Print_RunsCommand_SpecialCharacters()
     {
         var printer = GetPrinter();
-        printer.Initialize();
+        await printer.Initialize();
 
         var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
         var html = File.ReadAllText(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
         var result = await printer.Print(html);
 
         File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"), result.Bytes);
+
+        Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
+        Assert.Equal(0, result.ExitCode);
+        Assert.False(result.HasError);
+        Assert.True(result.Bytes.Length > 0);
     }
 
     private static Printer GetPrinter()
