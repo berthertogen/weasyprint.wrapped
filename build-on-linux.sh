@@ -21,11 +21,11 @@ rm $workingDir/python.tar.gz
 
 cd $workingDir
 
-versionClearedLowered=weasyprint==55
-echo "*** Version=$versionClearedLowered"
-touch "version-$versionClearedLowered"
+version=weasyprint==55
+echo "*** Version=$version"
+touch "version-$version"
 echo "cd python/bin/
-./python3.10 -m pip install weasyprint==55 2> /dev/null
+./python3.10 -m pip install $version 2> /dev/null
 ./python3.10 -m weasyprint - - --encoding utf8" >> print.sh
 
 echo "*** Create archive $assets/standalone-linux-64.zip"
