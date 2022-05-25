@@ -20,17 +20,20 @@ public class Printer
 
     public async Task Initialize()
     {
-        var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
-        if (File.Exists(Path.Combine(workingFolder, version)))
+        await Task.Run(() =>
         {
-            return;
-        }
-        if (Directory.Exists(workingFolder))
-        {
-            Directory.Delete(workingFolder, true);
-        }
-        Directory.CreateDirectory(workingFolder);
-        ZipFile.ExtractToDirectory(asset, workingFolder);
+            var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
+            if (File.Exists(Path.Combine(workingFolder, version)))
+            {
+                return;
+            }
+            if (Directory.Exists(workingFolder))
+            {
+                Directory.Delete(workingFolder, true);
+            }
+            Directory.CreateDirectory(workingFolder);
+            ZipFile.ExtractToDirectory(asset, workingFolder);
+        });
     }
 
     public async Task<PrintResult> Print(string html)
@@ -68,8 +71,6 @@ public class Printer
                 .Wrap("/bin/bash")
                 .WithArguments($"print.sh")
                 .WithWorkingDirectory($"{workingFolder}");
-                // .Wrap($"{workingFolder}/python/bin/python3.10")
-                // .WithWorkingDirectory($"{workingFolder}/python/bin/");
         }
         return command;
     }
