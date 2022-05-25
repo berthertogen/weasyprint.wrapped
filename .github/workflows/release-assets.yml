@@ -36,11 +36,14 @@ jobs:
         run: |
           tree -L 3
           zip --version
+          cd standalone-linux-64.zip
           touch version-${{ steps.set_version.outputs.tag-no-v }}
-          zip -d standalone-linux-64.zip/standalone-linux-64.zip version-*
-          zip -ur standalone-linux-64.zip/standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
-          zip -d standalone-windows-64.zip/standalone-windows-64.zip version-*
-          zip -ur standalone-windows-64.zip/standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-linux-64.zip version-*
+          zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          cd ../standalone-windows-64.zip
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-windows-64.zip version-*
+          zip -ur standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
       # - name: Create nuget package
       #   run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
       #   working-directory: ./src/Weasyprint.Wrapped
