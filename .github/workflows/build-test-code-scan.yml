@@ -72,7 +72,7 @@ jobs:
           dotnet-version: 6.0.x
       - uses: actions/download-artifact@v3
         with:
-          name: standalone-${{ matrix.osname }}-64.zip
+          name: assets
           path: assets
       - name: Test
         run: dotnet test --verbosity normal
