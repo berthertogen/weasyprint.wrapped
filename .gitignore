@@ -5,6 +5,7 @@ Weasyprint.Wrapped.Example/weasyprinter
 Print_RunsCommand_Result_Actual.pdf
 Print_RunsCommand_SpecialCharacters_Output.pdf
 result.pdf
+super-linter.log
 
 *.swp
 *.*~

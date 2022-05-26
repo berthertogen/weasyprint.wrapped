@@ -1,3 +1,5 @@
+#!/bin/bash
+
 workingDir="./standalone-linux-64";
 assets="./assets";
 version=weasyprint==55
@@ -23,12 +25,12 @@ wget -O $workingDir/python.tar.gz 'https://github.com/indygreg/python-build-stan
 tar -xvzf $workingDir/python.tar.gz -C $workingDir
 rm $workingDir/python.tar.gz
 
-cd $workingDir/python/bin/
+cd $workingDir/python/bin/ || exit
 ./python3.10 -m pip install $version 2> /dev/null
 ./python3.10 -m weasyprint --info
 
 echo "*** Version=$version"
-cd ../../
+cd ../../ || exit
 touch "version-$version"
 echo "cd python/bin/
 ./python3.10 -m weasyprint - - --encoding utf8" >> print.sh
