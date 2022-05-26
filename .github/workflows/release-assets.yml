@@ -36,7 +36,7 @@ jobs:
         run: |
           cd assets
           zip -d standalone-linux-64.zip "version-*"
-        # zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
         # cd standalone-linux-64.zip
         # unzip standalone-linux-64.zip -d standalone-linux-64
         # rm standalone-linux-64.zip
