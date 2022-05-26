@@ -2,7 +2,7 @@ name: build-test-code-scan
 
 on:
   push:
-    branches: [ main ]
+    branches-ignore: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -29,6 +29,18 @@ jobs:
       working-directory: ./src/Weasyprint.Wrapped
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+  lint:
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+    - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   build-assets-windows:
     runs-on: windows-latest
     steps:
