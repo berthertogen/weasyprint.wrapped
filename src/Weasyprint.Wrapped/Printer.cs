@@ -20,26 +20,35 @@ public class Printer
 
     public async Task Initialize()
     {
-            var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
-            if (File.Exists(Path.Combine(workingFolder, version)))
+        var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
+        if (File.Exists(Path.Combine(workingFolder, version)))
+        {
+            return;
+        }
+        if (Directory.Exists(workingFolder))
+        {
+            Directory.Delete(workingFolder, true);
+        }
+        Directory.CreateDirectory(workingFolder);
+        ZipFile.ExtractToDirectory(asset, workingFolder);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var stdErrBuffer = new StringBuilder();
+            var command = await Cli
+                .Wrap("/bin/bash")
+                .WithArguments(a =>
+                {
+                    a.Add("-c");
+                    a.Add("chmod -R 775 ./");
+                })
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithWorkingDirectory($"{workingFolder}")
+                .ExecuteAsync();
+            if (stdErrBuffer.Length > 0)
             {
-                return;
+                throw new InitializeException(command, stdErrBuffer.ToString());
             }
-            if (Directory.Exists(workingFolder))
-            {
-                Directory.Delete(workingFolder, true);
-            }
-            Directory.CreateDirectory(workingFolder);
-            ZipFile.ExtractToDirectory(asset, workingFolder);
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                await Cli
-                    .Wrap("/bin/bash")
-                    .WithArguments("-c 'chmod -R 775 .'")
-                    .WithWorkingDirectory($"{workingFolder}")
-                    .WithValidation(CommandResultValidation.None)
-                    .ExecuteAsync();
-            }
+        }
     }
 
     public async Task<PrintResult> Print(string html)
