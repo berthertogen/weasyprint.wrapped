@@ -35,6 +35,7 @@ jobs:
       - name: Add version files
         run: |
           cd assets
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
           zip -d standalone-linux-64.zip "version-*"
           zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
         # cd standalone-linux-64.zip
