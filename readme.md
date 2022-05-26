@@ -83,6 +83,10 @@ python3 -m weasyprint --info
 ## Linting (locally)
 
 Use [these instructions](https://github.com/github/super-linter/blob/main/docs/run-linter-locally.md) to run the super-linter locally.
+```
+docker pull github/super-linter:latest
+docker run -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true -e FILTER_REGEX_EXCLUDE: .*bin/.* -v $(pwd):/tmp/lint github/super-linter
+```
 
 ### Help
 
