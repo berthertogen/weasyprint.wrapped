@@ -41,6 +41,7 @@ public class Printer
         using var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
+            .WithArguments($"-m weasyprint - - --encoding utf8")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
@@ -61,16 +62,14 @@ public class Printer
         {
             command = Cli
                 .Wrap($"{workingFolder}/python/python.exe")
-                .WithArguments($"-m weasyprint - - --encoding utf8")
                 .WithWorkingDirectory($"{workingFolder}/python")
                 .WithEnvironmentVariables(env => env.Set("PATH", $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{workingFolder}/gtk3").FullName}"));
         }
         else
         {
             command = Cli
-                .Wrap("/bin/bash")
-                .WithArguments($"print.sh")
-                .WithWorkingDirectory($"{workingFolder}");
+                .Wrap($"{workingFolder}/python/bin/python3.10")
+                .WithWorkingDirectory($"{workingFolder}/python/bin/");
         }
         return command;
     }

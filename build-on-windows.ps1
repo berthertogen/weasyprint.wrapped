@@ -1,5 +1,6 @@
 $workingDir = "./standalone-windows-64";
 $assets = "./assets";
+$version = "weasyprint==55"
 
 if (Test-Path $workingDir) {
     Write-Host "*** Cleaning $workingDir"
@@ -30,7 +31,6 @@ Invoke-WebRequest -Uri "https://github.com/indygreg/python-build-standalone/rele
 Invoke-Expression "tar -xvzf $workingDir/python.tar.gz -C $workingDir"
 Remove-Item "$workingDir/python.tar.gz" -Recurse -Force | Out-Null
 
-$version = "weasyprint==55"
 Set-Location  "$workingDir/python"
 Write-Host "*** Installing $version"
 Invoke-Expression ".\python.exe -m pip install $version"

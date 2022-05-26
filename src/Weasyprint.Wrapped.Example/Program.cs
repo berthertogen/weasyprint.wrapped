@@ -2,7 +2,7 @@
 
 var printer = new Printer(new ConfigurationProvider());
 Console.WriteLine("Start initializing wrapper");
-printer.Initialize();
+await printer.Initialize();
 Console.WriteLine("Done initializing wrapper");
 Console.WriteLine("Start printing");
 var result = await printer.Print(File.ReadAllText("../Weasyprint.Wrapped.Tests/Expected/Print_RunsCommand_SpecialCharacters_Input.html"));
