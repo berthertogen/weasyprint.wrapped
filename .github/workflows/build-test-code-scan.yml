@@ -1,8 +1,6 @@
 name: build-test-code-scan
 
 on:
-  push:
-    branches-ignore: [ main ]
   pull_request:
     branches: [ main ]
 
