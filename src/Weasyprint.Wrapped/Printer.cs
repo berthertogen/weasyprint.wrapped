@@ -20,8 +20,6 @@ public class Printer
 
     public async Task Initialize()
     {
-        await Task.Run(() =>
-        {
             var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
             if (File.Exists(Path.Combine(workingFolder, version)))
             {
@@ -33,7 +31,15 @@ public class Printer
             }
             Directory.CreateDirectory(workingFolder);
             ZipFile.ExtractToDirectory(asset, workingFolder);
-        });
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                await Cli
+                    .Wrap("/bin/bash")
+                    .WithArguments("-c 'chmod -R 775 .'")
+                    .WithWorkingDirectory($"{workingFolder}")
+                    .WithValidation(CommandResultValidation.None)
+                    .ExecuteAsync();
+            }
     }
 
     public async Task<PrintResult> Print(string html)
