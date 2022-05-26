@@ -33,12 +33,19 @@ public class Printer
             ZipFile.ExtractToDirectory(asset, workingFolder);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
+                var stdErrBuffer = new StringBuilder();
                 await Cli
                     .Wrap("/bin/bash")
-                    .WithArguments("-c 'chmod -R 775 .'")
+                    .WithArguments(a => {
+                        a.Add("-c");
+                        a.Add("chmod -R 775 ./");
+                    })
+                    .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                     .WithWorkingDirectory($"{workingFolder}")
-                    .WithValidation(CommandResultValidation.None)
                     .ExecuteAsync();
+                if (stdErrBuffer.Length > 0) {
+                    throw new Exception(stdErrBuffer.ToString());
+                }
             }
     }
 
