@@ -1,16 +1,21 @@
+![build-test-code-scan](https://github.com/berthertogen/weasyprint.wrapped/actions/workflows/build-test-code-scan.yml/badge.svg)
+
 # Introduction
 
 Wrapper around the [weasyprint](https://github.com/Kozea/WeasyPrint) library which allows you to print html to a pdf file.
 This package does not require any external software or packages to be installed in order to use weasyprint.
 
-## Warning
-
-This is a large package, try to limit the projects where it will be installed.
-+-104 MB zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder (for windows).
-+-89.7 MB zipped resource (standalone python and weasyprint) which will be unzipped on initialization in the same folder (for linux).
-
 # Getting started
 
+## Installation
+
+[![NuGet Badge](https://buildstats.info/nuget/Weasyprint.Wrapped)](https://www.nuget.org/packages/Weasyprint.Wrapped/)
+
+```shell
+dotnet add package Weasyprint.Wrapped
+```
+
+## Usage
 You might want to provide the printer class using your DI Container.
 
 1. Initialize
@@ -23,6 +28,12 @@ new Printer().Initialize();
 ```csharp
 new Printer().Print("<html><body><h1>TEST</h1></body></html>");
 ```
+
+## Warning
+
+This is a large package, try to limit the projects where it will be installed.
++-104 MB zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder (for windows).
++-89.7 MB zipped resource (standalone python and weasyprint) which will be unzipped on initialization in the same folder (for linux).
 
 # Extra resources
 
