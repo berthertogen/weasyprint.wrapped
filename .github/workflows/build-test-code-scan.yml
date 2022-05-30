@@ -1,6 +1,8 @@
 name: build-test-code-scan
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -27,7 +29,32 @@ jobs:
       working-directory: ./src/Weasyprint.Wrapped
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
-  build-assets:
+  build-assets-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build asset
+        shell: pwsh
+        run: ./build-on-windows.ps1
+      - name: Upload asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-windows-64.zip
+  build-assets-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build asset
+        shell: bash
+        run: ./build-on-linux.sh
+      - name: Upload asset
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets/standalone-linux-64.zip
+  test-assets:
+    needs: [build-assets-windows, build-assets-linux]
     strategy:
         matrix:
           os: [ubuntu-latest, windows-latest]
@@ -39,18 +66,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - name: Build asset
-        shell: pwsh
-        run: ./build-on-${{ matrix.osname }}.ps1
       - name: Setup .NET Core SDK 6.0.x
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.x
+      - uses: actions/download-artifact@v3
+        with:
+          name: assets
+          path: assets
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
-      - name: Upload asset
-        uses: actions/upload-artifact@v3
-        with:
-          name: assets
-          path: ./assets/standalone-${{ matrix.osname }}-64.zip
+

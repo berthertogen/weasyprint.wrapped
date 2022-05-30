@@ -11,10 +11,12 @@
     <Company>Software Solutions Hertogen</Company>
     <RepositoryUrl>https://github.com/berthertogen/weasyprint.wrapped</RepositoryUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageTags>weasyprint;PDF;html;standalone</PackageTags>
+    <Description>A .netstandaard wrapper for the weasyprint PDF printer. This package is standalone and does not required you to install any software on your server. It runs on windows and linux.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-      <None Include="../../readme.md" Pack="true" PackagePath="\"/>
+      <None Include="../../readme.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.4.4" />
+    <!-- <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" /> -->
   </ItemGroup>
 
 </Project>

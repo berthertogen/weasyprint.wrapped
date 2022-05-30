@@ -32,6 +32,14 @@ jobs:
         with:
           workflow: build-test-code-scan.yml
           workflow_conclusion: success
+      - name: Add version files
+        run: |
+          cd assets
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-linux-64.zip "version-*"
+          zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          zip -d standalone-windows-64.zip "version-*"
+          zip -ur standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
       - name: Create nuget package
         run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
@@ -45,7 +53,6 @@ jobs:
         run: dotnet nuget push "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"  --api-key "${{ secrets.NUGET_TOKEN }}" --source https://api.nuget.org/v3/index.json
         working-directory: ./src/Weasyprint.Wrapped/nupkgs
       - name: Upload nuget package
-        id: upload-nuget-package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +62,6 @@ jobs:
           asset_name: "Weasyprint.Wrapped.${{ steps.set_version.outputs.tag-no-v }}.nupkg"
           asset_content_type: application/zip
       - name: Upload release asset linux
-        id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,7 +71,6 @@ jobs:
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
       - name: Upload release asset windows
-        id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

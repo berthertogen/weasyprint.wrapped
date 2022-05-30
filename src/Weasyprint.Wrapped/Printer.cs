@@ -18,7 +18,7 @@ public class Printer
         asset = configurationProvider.GetAsset();
     }
 
-    public void Initialize()
+    public async Task Initialize()
     {
         var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
         if (File.Exists(Path.Combine(workingFolder, version)))
@@ -31,6 +31,24 @@ public class Printer
         }
         Directory.CreateDirectory(workingFolder);
         ZipFile.ExtractToDirectory(asset, workingFolder);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var stdErrBuffer = new StringBuilder();
+            var command = await Cli
+                .Wrap("/bin/bash")
+                .WithArguments(a =>
+                {
+                    a.Add("-c");
+                    a.Add("chmod -R 775 ./");
+                })
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithWorkingDirectory($"{workingFolder}")
+                .ExecuteAsync();
+            if (stdErrBuffer.Length > 0)
+            {
+                throw new InitializeException(command, stdErrBuffer.ToString());
+            }
+        }
     }
 
     public async Task<PrintResult> Print(string html)
@@ -65,8 +83,8 @@ public class Printer
         else
         {
             command = Cli
-                .Wrap("python3")
-                .WithWorkingDirectory($"{workingFolder}/python/bin");
+                .Wrap($"{workingFolder}/python/bin/python3.10")
+                .WithWorkingDirectory($"{workingFolder}/python/bin/");
         }
         return command;
     }

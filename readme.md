@@ -18,22 +18,21 @@ dotnet add package Weasyprint.Wrapped
 ## Usage
 You might want to provide the printer class using your DI Container.
 
-1. Initialize
-This will unzip the needed asset, this is best done during startup procedure.
-The printer will check if the asset is already unzipped, so the process is only done once (or when the package is upgraded and the weasyprint version changed).
+1. Initialize  
+This will unzip the needed asset, it is best done during startup procedure.
+The printer will check if the asset is already unzipped, so the process is only done once (or when the package is upgraded and the version changed).
 ```csharp
-new Printer().Initialize();
+await new Printer().Initialize();
 ```
 2. Print
 ```csharp
-new Printer().Print("<html><body><h1>TEST</h1></body></html>");
+await new Printer().Print("<html><body><h1>TEST</h1></body></html>");
 ```
-
 ## Warning
 
-This is a large package, try to limit the projects where it will be installed.
-+-104 MB zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder (for windows).
-+-89.7 MB zipped resource (standalone python and weasyprint) which will be unzipped on initialization in the same folder (for linux).
+This is a large package, try to limit the projects where it will be installed.  
+- +-104 MB zipped resource (standalone python, gtk3 for windows and weasyprint) which will be unzipped on initialization in the same folder (for windows).
+- +-89.7 MB zipped resource (standalone python and weasyprint) which will be unzipped on initialization in the same folder (for linux).
 
 # Extra resources
 
