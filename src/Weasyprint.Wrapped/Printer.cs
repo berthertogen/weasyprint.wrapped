@@ -39,7 +39,7 @@ public class Printer
                 .WithArguments(a =>
                 {
                     a.Add("-c");
-                    a.Add("chmod -R 775 ./");
+                    a.Add("chmod -R 775 .");
                 })
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithWorkingDirectory($"{workingFolder}")
