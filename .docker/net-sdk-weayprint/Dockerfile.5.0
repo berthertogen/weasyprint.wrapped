@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libglib2.0-dev \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+    && rm -rf /var/lib/apt/lists/*
