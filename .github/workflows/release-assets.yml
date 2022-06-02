@@ -86,7 +86,7 @@ jobs:
           asset_name: standalone-windows-64.zip
           asset_content_type: application/zip
 
-    push-image-to-docker-hub: 
+  push-image-to-docker-hub: 
     runs-on: ubuntu-latest 
     steps:
       - name: Checkout 
