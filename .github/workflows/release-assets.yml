@@ -114,13 +114,3 @@ jobs:
           file: .docker/net-sdk-weayprint/Dockerfile.6.0
           push: true
           tags: berthertogen/net-sdk-6-weayprint:latest, berthertogen/net-sdk-6-weayprint:${{ steps.set_version.outputs.tag-no-v }}
-      - name: Build and push 5.0
-        uses: docker/build-push-action@v2
-        with:
-          context: .docker/net-sdk-weayprint/
-          file: .docker/net-sdk-weayprint/Dockerfile.5.0
-          push: true
-          tags: berthertogen/net-sdk-5-weayprint:latest, berthertogen/net-sdk-5-weayprint:${{ steps.set_version.outputs.tag-no-v }}
-
-
-
