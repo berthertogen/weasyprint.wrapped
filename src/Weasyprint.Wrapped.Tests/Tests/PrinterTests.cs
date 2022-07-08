@@ -112,6 +112,19 @@ public class PrinterTests
         Assert.True(result.Bytes.Length > 0);
     }
 
+    [Fact]
+    public async Task Version_ReturnsVersion()
+    {
+        var printer = GetPrinter();
+        await printer.Initialize();
+
+        var result = await printer.Version();
+
+        Assert.Contains("WeasyPrint version: 56.0", result.Version);
+        Assert.Equal(0, result.ExitCode);
+        Assert.False(result.HasError);
+    }
+
     private static Printer GetPrinter()
     {
         var config = new ConfigurationProvider("../../../../../assets/", false, "weasyprinter", false);
