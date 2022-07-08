@@ -89,4 +89,21 @@ public class Printer
         return command;
     }
 
+    public async Task<VersionResult> Version()
+    {
+        var stdOutBuffer = new StringBuilder();
+        var stdErrBuffer = new StringBuilder();
+        var result = await BuildOsSpecificCommand()
+            .WithArguments($"-m weasyprint --info")
+            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
+            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync(Encoding.UTF8);
+        return new VersionResult(
+            stdOutBuffer.ToString(),
+            stdErrBuffer.ToString(),
+            result.RunTime,
+            result.ExitCode
+        );
+    }
 }

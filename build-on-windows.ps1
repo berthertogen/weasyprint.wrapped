@@ -1,6 +1,6 @@
 $workingDir = "./standalone-windows-64";
 $assets = "./assets";
-$version = "weasyprint==55"
+$version = "weasyprint==56"
 
 if (Test-Path $workingDir) {
     Write-Host "*** Cleaning $workingDir"
