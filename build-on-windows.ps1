@@ -33,8 +33,8 @@ Remove-Item "$workingDir/python.tar.gz" -Recurse -Force | Out-Null
 
 Set-Location  "$workingDir/python"
 Write-Host "*** Installing $version"
+$Env:PATH = "$workingDir/gtk3;$Env:PATH"
 Invoke-Expression ".\python.exe -m pip install $version"
-$Env:PATH += ";$workingDir/gtk3"
 Write-Host "*** Testing weasyprint"
 Invoke-Expression ".\python.exe -m weasyprint --info"
 New-Item -Path "$workingDir/version-$version"
