@@ -78,7 +78,7 @@ public class Printer
             command = Cli
                 .Wrap($"{workingFolder}/python/python.exe")
                 .WithWorkingDirectory($"{workingFolder}/python")
-                .WithEnvironmentVariables(env => env.Set("PATH", $"{Environment.GetEnvironmentVariable("PATH")};{new FileInfo($"{workingFolder}/gtk3").FullName}"));
+                .WithEnvironmentVariables(env => env.Set("PATH", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("PATH")}"));
         }
         else
         {
