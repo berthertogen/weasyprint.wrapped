@@ -1,6 +1,6 @@
 workingDir="./standalone-linux-64";
 assets="./assets";
-version=weasyprint==56
+version=weasyprint==57
 
 if [ -d "$workingDir" ]; then
   echo "*** Cleaning $workingDir"
