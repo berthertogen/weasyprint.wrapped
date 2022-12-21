@@ -51,6 +51,11 @@ public class Printer
         }
     }
 
+    public async Task<PrintResult> Print(string html)
+    {
+        return await Print(html, cancellationToken: default);
+    }
+
     public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default)
     {
         using var outputStream = new MemoryStream();
