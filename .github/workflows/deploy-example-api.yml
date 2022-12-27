@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release ${{SOURCE_PATH}}
+        run: dotnet build --configuration Release ${{env.SOURCE_PATH}}
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
