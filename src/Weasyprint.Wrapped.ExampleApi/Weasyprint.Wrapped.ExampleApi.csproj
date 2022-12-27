@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    <PackageReference Include="Weasyprint.Wrapped" Version="0.0.24" />
+    <PackageReference Include="Weasyprint.Wrapped" Version="3.0.1" />
   </ItemGroup>
 
 </Project>
