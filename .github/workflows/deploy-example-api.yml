@@ -5,6 +5,10 @@ env:
   AZURE_WEBAPP_PACKAGE_PATH: './src/Weasyprint.Wrapped.ExampleApi/'
   DOTNET_VERSION: '6'
 
+on:
+  push:
+    branches:
+      - issue/39/testing
 
 jobs:
   build:
