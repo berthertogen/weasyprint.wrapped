@@ -1,9 +1,10 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Weasyprint.Wrapped.ExampleApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class PrintController : ControllerBase
 {
     private readonly ILogger<WeatherForecastController> _logger;
@@ -48,5 +49,24 @@ public class PrintController : ControllerBase
         {
             FileDownloadName = "result.pdf"
         };
+    }
+    
+    [HttpGet(Name = "Version")]
+    public async Task<IActionResult> Version()
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+        var printer = new Printer(new ConfigurationProvider());
+        _logger.LogInformation("Start initializing wrapper");
+        await printer.Initialize();
+        _logger.LogInformation("Done initializing wrapper");
+        _logger.LogInformation("Version");
+        var versionResult = await printer.Version();
+        _logger.LogInformation($" - ExitCode:            {versionResult.ExitCode}");
+        _logger.LogInformation($" - HasError:            {versionResult.HasError}");
+        _logger.LogInformation($" - Error:               {versionResult.Error}");
+        _logger.LogInformation($" - RunTime:             {versionResult.RunTime}");
+        _logger.LogInformation($" - Version:             {versionResult.Version}");
+        return new JsonResult(versionResult);
     }
 }
