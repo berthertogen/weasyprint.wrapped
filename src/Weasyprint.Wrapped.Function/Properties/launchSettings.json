@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Weasyprint.Wrapped.Function": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7135",
-      "launchBrowser": false
-    }
-  }
-}
