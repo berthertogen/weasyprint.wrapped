@@ -53,6 +53,11 @@ public class Printer
 
     public async Task<PrintResult> Print(string html)
     {
+        return await Print(html, cancellationToken: default);
+    }
+
+    public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default)
+    {
         using var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
@@ -61,7 +66,7 @@ public class Printer
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
-            .ExecuteBufferedAsync(Encoding.UTF8);
+            .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
         return new PrintResult(
             outputStream.ToArray(),
             stdErrBuffer.ToString(),
