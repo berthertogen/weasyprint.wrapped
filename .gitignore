@@ -13,7 +13,6 @@ project.lock.json
 *.pyc
 
 # Visual Studio Code
-.vscode
 
 # Rider
 .idea
@@ -42,3 +41,5 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+*.PublishSettings
