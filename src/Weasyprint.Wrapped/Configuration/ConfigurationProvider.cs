@@ -5,6 +5,7 @@ public class ConfigurationProvider
 {
     protected readonly string assetsFolder;
     protected readonly string workingFolder;
+    private string baseUrl = ".";
 
     public ConfigurationProvider() : this(string.Empty, false, "weasyprinter", false) { }
 
@@ -27,4 +28,12 @@ public class ConfigurationProvider
 
     public string GetWorkingFolder()
         => workingFolder;
+
+    public void SetBaseUrl(string baseUrl)
+    {
+        this.baseUrl = baseUrl;
+    }
+
+    public string GetBaseUrl()
+        => baseUrl;
 }
