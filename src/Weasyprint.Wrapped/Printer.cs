@@ -9,6 +9,7 @@ public class Printer
 {
     private readonly string workingFolder;
     private readonly string asset;
+    private readonly string baseUrl;
 
     public Printer() : this(new ConfigurationProvider()) { }
 
@@ -16,6 +17,7 @@ public class Printer
     {
         workingFolder = configurationProvider.GetWorkingFolder();
         asset = configurationProvider.GetAsset();
+        baseUrl = configurationProvider.GetBaseUrl();
     }
 
     public async Task Initialize()
@@ -61,7 +63,7 @@ public class Printer
         using var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - --encoding utf8")
+            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl}")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
