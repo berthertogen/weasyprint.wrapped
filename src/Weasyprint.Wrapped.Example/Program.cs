@@ -12,7 +12,7 @@ Console.WriteLine($" - Error:               {versionResult.Error}");
 Console.WriteLine($" - RunTime:             {versionResult.RunTime}");
 Console.WriteLine($" - Version:             {versionResult.Version}");
 Console.WriteLine("Start printing");
-var result = await printer.Print(File.ReadAllText("../Weasyprint.Wrapped.Tests/Expected/Print_RunsCommand_SpecialCharacters_Input.html"));
+var result = await printer.Print(File.ReadAllText("../Weasyprint.Wrapped.Tests/Expected/Print_RunsCommand_SpecialCharacters_Input.html"), "--optimize-images");
 Console.WriteLine("Done printing");
 Console.WriteLine($" - ExitCode:            {result.ExitCode}");
 Console.WriteLine($" - HasError:            {result.HasError}");
