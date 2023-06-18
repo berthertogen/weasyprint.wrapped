@@ -36,6 +36,8 @@ This is a large package, try to limit the projects where it will be installed.
 
 # Extra resources
 
+## References
+
 Thanks to all these great repos and the guys maintaining them!!!
 
 * https://github.com/balbarak/WeasyPrint-netcore
@@ -43,7 +45,75 @@ Thanks to all these great repos and the guys maintaining them!!!
 * https://wiki.python.org/moin/EmbeddedPython
 * https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
 
+## [Weasyprint CLI](https://doc.courtbouillon.org/weasyprint/stable/api_reference.html#command-line-api)
+
+The weasyprint program takes at least two arguments:
+
+`weasyprint [options] <input> <output>`
+
+* `input`: URL or filename of the HTML input, or - for stdin.
+
+* `output`: Filename where output is written, or - for stdout.
+
+* `-e <encoding>, --encoding <encoding>`: Force the input character encoding.
+
+* `-s <stylesheet>, --stylesheet <stylesheet>` URL or filename for a user CSS stylesheet.
+
+This option can be passed multiple times.
+
+* `-m <media-type>, --media-type <media-type>` Media type to use for @media, defaults to print.
+
+* `-u <base-url>, --base-url <base-url>` Base for relative URLs in the HTML input, defaults to the input’s own filename or URL or the current directory for stdin.
+
+* `-a <attachment>, --attachment <attachment>` URL or filename of a file to attach to the PDF document. This option can be passed multiple times.
+
+* `--pdf-identifier <pdf-identifier>` PDF file identifier.
+
+* `--pdf-variant <pdf-variant>` PDF variant to generate. 
+  
+  Possible choices: pdf/a-1b, pdf/a-2b, pdf/a-3b, pdf/a-4b, pdf/ua-1.
+
+* `--pdf-version <pdf-version>` PDF version number.
+
+* `--pdf-forms` Include PDF forms.
+
+* `--uncompressed-pdf` Do not compress PDF content, mainly for debugging purpose.
+
+* `--custom-metadata` Include custom HTML meta tags in PDF metadata.
+
+* `-p, --presentational-hints` Follow HTML presentational hints.
+
+* `--optimize-images` Optimize size of embedded images with no quality loss.
+
+* `-j <jpeg-quality>, --jpeg-quality <jpeg-quality>` JPEG quality between 0 (worst) to 95 (best).
+
+* `--full-fonts` Embed unmodified font files when possible.
+
+* `--hinting` Keep hinting information in embedded fonts.
+
+* `-c <cache-folder>, --cache-folder <cache-folder>` Store cache on disk instead of memory, folder is created if needed and cleaned after the PDF is generated.
+
+* `-D <dpi>, --dpi <dpi>` Set maximum resolution of images embedded in the PDF.
+
+* `-v, --verbose` Show warnings and information messages.
+
+* `-d, --debug` Show debugging messages.
+
+* `-q, --quiet` Hide logging messages.
+
+* `--version` Print WeasyPrint’s version number and exit.
+
+* `-i, --info` Print system information and exit.
+
+* `-O <optimize-size>, --optimize-size <optimize-size>` Deprecated, use other options instead.
+
+  Possible choices: images, fonts, hinting, pdf, all, none.
+This option can be passed multiple times.
+
+* `-h, --help`: Show this help message and exit.
+
 # Contribute
+
 ## Create test package and run example
 
 Windows:
@@ -57,7 +127,7 @@ Linux:
 Create package:
 ```
 cd .\src\Weasyprint.Wrapped\
-dotnet pack -p:PackageVersion=0.0.[[NUMBER HERE]] --output nupkgs
+dotnet pack -p:PackageVersion=0.0.25 --output nupkgs
 ```
 
 Update the example project package version (Weasyprint.Wrapped.Example.csproj) and run the example to test it

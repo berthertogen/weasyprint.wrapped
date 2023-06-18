@@ -53,11 +53,22 @@ public class Printer
         }
     }
 
+    /// <summary>
+    /// Prints the given html to pdf using the weasyprint library.
+    /// </summary>
+    /// <param name="html">html content to be converted to pdf</param>
+    /// <param name="additionalParameters">list of additional parameter for weasyprint (see readme.md#Weasyprint-CLI)</param>
     public async Task<PrintResult> Print(string html, params string[] additionalParameters)
     {
-        return await Print(html, additionalParameters);
+        return await Print(html, default, additionalParameters);
     }
 
+    /// <summary>
+    /// Prints the given html to pdf using the weasyprint library.
+    /// </summary>
+    /// <param name="html">html content to be converted to pdf</param>
+    /// <param name="cancellationToken">Optional cancellationToken, passed to the executing command</param>
+    /// <param name="additionalParameters">list of additional parameter for weasyprint (see readme.md#Weasyprint-CLI)</param>
     public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default, params string[] additionalParameters)
     {
         using var outputStream = new MemoryStream();

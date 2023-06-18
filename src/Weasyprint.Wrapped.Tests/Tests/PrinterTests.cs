@@ -95,6 +95,26 @@ public class PrinterTests
     }
 
     [Fact]
+    public async Task Print_RunsCommand_WithParameters()
+    {
+        var printer = GetPrinter();
+        await printer.Initialize();
+
+        var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+        var html = File.ReadAllText(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
+        var resultNormal = await printer.Print(html);
+        Assert.True(string.IsNullOrWhiteSpace(resultNormal.Error), $"Should have no error but found {resultNormal.Error}");
+        Assert.Equal(0, resultNormal.ExitCode);
+        Assert.False(resultNormal.HasError);
+        var resultOptimized = await printer.Print(html, "--optimize-images");
+        Assert.True(string.IsNullOrWhiteSpace(resultOptimized.Error), $"Should have no error but found {resultOptimized.Error}");
+        Assert.Equal(0, resultOptimized.ExitCode);
+        Assert.False(resultOptimized.HasError);
+
+        Assert.True(resultNormal.Bytes.Length > resultOptimized.Bytes.Length, $"Expected {resultNormal.Bytes.Length} to be greater than {resultOptimized.Bytes.Length}");
+    }
+
+    [Fact]
     public async Task Print_RunsCommand_SpecialCharacters()
     {
         var printer = GetPrinter();
