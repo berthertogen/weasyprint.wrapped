@@ -53,17 +53,17 @@ public class Printer
         }
     }
 
-    public async Task<PrintResult> Print(string html)
+    public async Task<PrintResult> Print(string html, params string[] additionalParameters)
     {
-        return await Print(html, cancellationToken: default);
+        return await Print(html, additionalParameters);
     }
 
-    public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default)
+    public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default, params string[] additionalParameters)
     {
         using var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl}")
+            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
