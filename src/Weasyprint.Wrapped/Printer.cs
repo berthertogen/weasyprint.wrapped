@@ -88,6 +88,29 @@ public class Printer
         );
     }
 
+    /// <summary>
+    /// Prints the given html to pdf using the weasyprint library.
+    /// </summary>
+    /// <param name="htmlFile">html file name with path to be converted to pdf</param>
+    /// <param name="pdfFile">pdf file name with path for output</param>
+    /// <param name="cancellationToken">Optional cancellationToken, passed to the executing command</param>
+    /// <param name="additionalParameters">list of additional parameter for weasyprint (see readme.md#Weasyprint-CLI)</param>
+    public async Task<PrintResult> Print(string htmlFile, string pdfFile, CancellationToken cancellationToken = default, params string[] additionalParameters)
+    {
+        var stdErrBuffer = new StringBuilder();
+        var result = await BuildOsSpecificCommand()
+            .WithArguments($"-m weasyprint --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
+            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
+        return new PrintResult(
+            Array.Empty<byte>(),
+            stdErrBuffer.ToString(),
+            result.RunTime,
+            result.ExitCode
+        );
+    }    
+    
     private Command BuildOsSpecificCommand()
     {
         Command command;
