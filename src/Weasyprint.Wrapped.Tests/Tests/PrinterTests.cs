@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -92,6 +93,25 @@ public class PrinterTests
         var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot, $"Expected/{filename}"));
         File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_Result_Actual.pdf"), result.Bytes);
         Assert.True(result.Bytes.Length > 0);
+    }
+
+    [Fact]
+    public async Task Print_RunsCommand_WithFilePaths_Simple()
+    {
+        var printer = GetPrinter();
+        await printer.Initialize();
+
+        var testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
+        var inputFile = Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_Simple_Input.html");
+        var outputFile = Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_WithFilePaths_Result_Actual.pdf");
+        var result = await printer.Print(inputFile, outputFile, CancellationToken.None);
+
+        Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
+        Assert.Equal(0, result.ExitCode);
+        Assert.False(result.HasError);
+
+        var outputFileBytes = File.ReadAllBytes(outputFile);
+        Assert.True(outputFileBytes.Length > 0);
     }
 
     [Fact]
