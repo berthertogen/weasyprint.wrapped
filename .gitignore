@@ -4,6 +4,7 @@ standalone-*-64
 Weasyprint.Wrapped.Example/weasyprinter
 Print_RunsCommand_Result_Actual.pdf
 Print_RunsCommand_SpecialCharacters_Output.pdf
+Print_RunsCommand_WithFilePaths_Result_Actual.pdf
 result.pdf
 
 *.swp
