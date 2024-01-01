@@ -132,6 +132,14 @@ dotnet pack -p:PackageVersion=0.0.25 --output nupkgs
 
 Update the example project package version (Weasyprint.Wrapped.Example.csproj) and run the example to test it
 
+## Error in tests
+
+The following error might be thrown when running the tests on windows:
+``` shell
+(process:13448): GLib-GIO-WARNING **: 17:21:45.816: Unexpectedly, UWP app `Microsoft.OutlookForWindows_1.2023.1114.100_x64__8wekyb3d8bbwe' (AUMId `Microsoft.OutlookForWindows_8wekyb3d8bbwe!Microsoft.OutlookforWindows') supports 1 extensions but has no verbs
+```
+Check here for the answer: <https://stackoverflow.com/questions/67607643/what-does-this-warning-mean-it-happens-every-time-i-restart-the-node-process#answer-67715630>
+
 ## Building assets
 
 ### Windows (build-on-windows.ps1 does approximately this)
