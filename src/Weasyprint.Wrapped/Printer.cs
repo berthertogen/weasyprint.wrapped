@@ -5,19 +5,21 @@ using CliWrap;
 using CliWrap.Buffered;
 
 namespace Weasyprint.Wrapped;
+
 public class Printer
 {
     private readonly string workingFolder;
     private readonly string asset;
     private readonly string baseUrl;
 
-    public Printer() : this(new ConfigurationProvider()) { }
+    public Printer()
+        : this(new ConfigurationProvider()) {}
 
     public Printer(ConfigurationProvider configurationProvider)
     {
         workingFolder = configurationProvider.GetWorkingFolder();
-        asset = configurationProvider.GetAsset();
-        baseUrl = configurationProvider.GetBaseUrl();
+        asset         = configurationProvider.GetAsset();
+        baseUrl       = configurationProvider.GetBaseUrl();
     }
 
     public async Task Initialize()
@@ -27,25 +29,28 @@ public class Printer
         {
             return;
         }
+
         if (Directory.Exists(workingFolder))
         {
             Directory.Delete(workingFolder, true);
         }
+
         Directory.CreateDirectory(workingFolder);
         ZipFile.ExtractToDirectory(asset, workingFolder);
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             var stdErrBuffer = new StringBuilder();
             var command = await Cli
-                .Wrap("/bin/bash")
-                .WithArguments(a =>
-                {
-                    a.Add("-c");
-                    a.Add("chmod -R 775 .");
-                })
-                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-                .WithWorkingDirectory($"{workingFolder}")
-                .ExecuteAsync();
+                               .Wrap("/bin/bash")
+                               .WithArguments(a =>
+                                {
+                                    a.Add("-c");
+                                    a.Add("chmod -R 775 .");
+                                })
+                               .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                               .WithWorkingDirectory($"{workingFolder}")
+                               .ExecuteAsync();
+
             if (stdErrBuffer.Length > 0)
             {
                 throw new InitializeException(command, stdErrBuffer.ToString());
@@ -66,26 +71,52 @@ public class Printer
     /// <summary>
     /// Prints the given html to pdf using the weasyprint library.
     /// </summary>
+    /// <returns>A result with a byte array containing the generated pdf</returns>
     /// <param name="html">html content to be converted to pdf</param>
     /// <param name="cancellationToken">Optional cancellationToken, passed to the executing command</param>
     /// <param name="additionalParameters">list of additional parameter for weasyprint (see readme.md#Weasyprint-CLI)</param>
     public async Task<PrintResult> Print(string html, CancellationToken cancellationToken = default, params string[] additionalParameters)
     {
-        using var outputStream = new MemoryStream();
+        var streamResult = await PrintStream(html, cancellationToken, additionalParameters);
+        
+        var documentBytes = (streamResult.DocumentStream as MemoryStream)?.ToArray() ?? [];
+        streamResult.DocumentStream.Dispose();
+        
+        return new PrintResult(
+                               documentBytes,
+                               streamResult.Error,
+                               streamResult.RunTime,
+                               streamResult.ExitCode
+                              );
+    }
+
+    /// <summary>
+    /// Prints the given html to pdf using the weasyprint library.
+    /// </summary>
+    /// <returns>A result with an open stream containing the generated pdf document</returns>
+    /// <param name="html">html content to be converted to pdf</param>
+    /// <param name="cancellationToken">Optional cancellationToken, passed to the executing command</param>
+    /// <param name="additionalParameters">list of additional parameter for weasyprint (see readme.md#Weasyprint-CLI)</param>
+    public async Task<PrintStreamResult> PrintStream(string html, CancellationToken cancellationToken = default, params string[] additionalParameters)
+    {
+        var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
-            .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
-            .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithValidation(CommandResultValidation.None)
-            .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
-        return new PrintResult(
-            outputStream.ToArray(),
-            stdErrBuffer.ToString(),
-            result.RunTime,
-            result.ExitCode
-        );
+                          .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
+                          .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
+                          .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
+                          .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                          .WithValidation(CommandResultValidation.None)
+                          .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
+
+        outputStream.Seek(0, SeekOrigin.Begin);
+        
+        return new PrintStreamResult(
+                                     outputStream,
+                                     stdErrBuffer.ToString(),
+                                     result.RunTime,
+                                     result.ExitCode
+                                    );
     }
 
     /// <summary>
@@ -99,34 +130,37 @@ public class Printer
     {
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithValidation(CommandResultValidation.None)
-            .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
+                          .WithArguments($"-m weasyprint --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
+                          .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                          .WithValidation(CommandResultValidation.None)
+                          .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
+
         return new PrintResult(
-            Array.Empty<byte>(),
-            stdErrBuffer.ToString(),
-            result.RunTime,
-            result.ExitCode
-        );
-    }    
-    
+                               Array.Empty<byte>(),
+                               stdErrBuffer.ToString(),
+                               result.RunTime,
+                               result.ExitCode
+                              );
+    }
+
     private Command BuildOsSpecificCommand()
     {
         Command command;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             command = Cli
-                .Wrap($"{workingFolder}/python/python.exe")
-                .WithWorkingDirectory($"{workingFolder}/python")
-                .WithEnvironmentVariables(env => env.Set("PATH", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("PATH")}"));
+                     .Wrap($"{workingFolder}/python/python.exe")
+                     .WithWorkingDirectory($"{workingFolder}/python")
+                     .WithEnvironmentVariables(env => env.Set("PATH",
+                                                              $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("PATH")}"));
         }
         else
         {
             command = Cli
-                .Wrap($"{workingFolder}/python/bin/python3.10")
-                .WithWorkingDirectory($"{workingFolder}/python/bin/");
+                     .Wrap($"{workingFolder}/python/bin/python3.10")
+                     .WithWorkingDirectory($"{workingFolder}/python/bin/");
         }
+
         return command;
     }
 
@@ -135,16 +169,17 @@ public class Printer
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint --info")
-            .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
-            .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-            .WithValidation(CommandResultValidation.None)
-            .ExecuteBufferedAsync(Encoding.UTF8);
+                          .WithArguments($"-m weasyprint --info")
+                          .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
+                          .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                          .WithValidation(CommandResultValidation.None)
+                          .ExecuteBufferedAsync(Encoding.UTF8);
+
         return new VersionResult(
-            stdOutBuffer.ToString(),
-            stdErrBuffer.ToString(),
-            result.RunTime,
-            result.ExitCode
-        );
+                                 stdOutBuffer.ToString(),
+                                 stdErrBuffer.ToString(),
+                                 result.RunTime,
+                                 result.ExitCode
+                                );
     }
 }
