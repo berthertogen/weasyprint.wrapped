@@ -34,7 +34,7 @@ jobs:
           draft: true
           prerelease: true
       - name: Download artifact
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v6
         with:
           workflow: build-test-code-scan.yml
           workflow_conclusion: success
