@@ -19,7 +19,7 @@ jobs:
         language: [ 'csharp' ]
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
@@ -32,24 +32,24 @@ jobs:
   build-assets-windows:
     runs-on: windows-2019
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build asset
         shell: pwsh
         run: ./build-on-windows.ps1
       - name: Upload asset
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: ./assets/standalone-windows-64.zip
   build-assets-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build asset
         shell: bash
         run: ./build-on-linux.sh
       - name: Upload asset
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: ./assets/standalone-linux-64.zip
@@ -65,12 +65,12 @@ jobs:
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup .NET Core SDK 8.x
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 8.x
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: assets
           path: assets
