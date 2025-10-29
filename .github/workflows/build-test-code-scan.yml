@@ -39,7 +39,7 @@ jobs:
       - name: Upload asset
         uses: actions/upload-artifact@v4
         with:
-          name: assets
+          name: assets-windows
           path: ./assets/standalone-windows-64.zip
   build-assets-linux:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       - name: Upload asset
         uses: actions/upload-artifact@v4
         with:
-          name: assets
+          name: assets-linux
           path: ./assets/standalone-linux-64.zip
   test-assets:
     needs: [build-assets-windows, build-assets-linux]
