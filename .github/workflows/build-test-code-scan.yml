@@ -37,7 +37,7 @@ jobs:
         shell: pwsh
         run: ./build-on-windows.ps1
       - name: Upload asset
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: ./assets/standalone-windows-64.zip
@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: ./build-on-linux.sh
       - name: Upload asset
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: ./assets/standalone-linux-64.zip
