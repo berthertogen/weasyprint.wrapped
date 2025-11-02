@@ -1,9 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -14,19 +14,16 @@ namespace Weasyprint.Wrapped.Tests;
 public class PrinterTests
 {
     private readonly string testingProjectRoot = new DirectoryInfo(AppContext.BaseDirectory).Parent.Parent.Parent.FullName;
-    
+
     public PrinterTests()
     {
-        if (Directory.Exists("./weasyprinter"))
-        {
-            Directory.Delete("./weasyprinter", true);
-        }
+        if (Directory.Exists("./weasyprinter")) Directory.Delete("./weasyprinter", true);
     }
 
     [Fact]
     public async Task Initialize_UnzipsAssetToFolder()
     {
-       await GetPrinter().Initialize();
+        await GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
         Assert.True(Directory.Exists("./weasyprinter/python"));
@@ -49,7 +46,7 @@ public class PrinterTests
     public async Task Initialize_UnzipsAssetToFolder_DeletesFolderIfVersionIsDifferent()
     {
         Directory.CreateDirectory("./weasyprinter");
-        var fileStream = File.Create($"./weasyprinter/version-somethingdifferent");
+        var fileStream = File.Create("./weasyprinter/version-somethingdifferent");
         fileStream.Close();
 
         var timeBeforeAction = DateTime.Now;
@@ -95,7 +92,7 @@ public class PrinterTests
         File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_Result_Actual.pdf"), result.Bytes);
         Assert.True(result.Bytes.Length > 0);
     }
-    
+
     [Fact]
     public async Task Print_RunsStreamCommand_Simple()
     {
@@ -105,7 +102,7 @@ public class PrinterTests
         var result = await printer.PrintStream("<html><body><h1>TEST</h1></body></html>");
 
         var actualOutputBytes = (result.DocumentStream as MemoryStream)?.ToArray();
-        
+
         Assert.NotNull(actualOutputBytes);
         Assert.True(actualOutputBytes.Length > 0);
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
@@ -114,7 +111,7 @@ public class PrinterTests
 
         var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
         var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot, $"Expected/{filename}"));
-        
+
         Assert.True(actualOutputBytes.Length > 0);
     }
 
@@ -124,7 +121,7 @@ public class PrinterTests
         var printer = GetPrinter();
         await printer.Initialize();
 
-        var inputFile = Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_Simple_Input.html");
+        var inputFile = Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_Simple_Input.html");
         var outputFile = Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_WithFilePaths_Result_Actual.pdf");
         var result = await printer.Print(inputFile, outputFile, CancellationToken.None);
 
@@ -142,7 +139,7 @@ public class PrinterTests
         var printer = GetPrinter();
         await printer.Initialize();
 
-        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
+        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Input.html"), Encoding.UTF8);
         var resultNormal = await printer.Print(html);
         Assert.True(string.IsNullOrWhiteSpace(resultNormal.Error), $"Should have no error but found {resultNormal.Error}");
         Assert.Equal(0, resultNormal.ExitCode);
@@ -154,32 +151,33 @@ public class PrinterTests
 
         Assert.True(resultNormal.Bytes.Length > resultOptimized.Bytes.Length, $"Expected {resultNormal.Bytes.Length} to be greater than {resultOptimized.Bytes.Length}");
     }
-    
+
     [Fact]
     public async Task Print_RunsStreamCommand_WithParameters()
     {
         var printer = GetPrinter();
         await printer.Initialize();
 
-        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
-        
+        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Input.html"), Encoding.UTF8);
+
         var resultNormal = await printer.PrintStream(html);
-        
+
         Assert.NotNull(resultNormal.DocumentStream);
         Assert.True(resultNormal.DocumentStream.Length > 0);
         Assert.True(string.IsNullOrWhiteSpace(resultNormal.Error), $"Should have no error but found {resultNormal.Error}");
         Assert.Equal(0, resultNormal.ExitCode);
         Assert.False(resultNormal.HasError);
-        
-        var resultOptimized = await printer.PrintStream(html, cancellationToken: default, "--optimize-images");
-        
+
+        var resultOptimized = await printer.PrintStream(html, default, "--optimize-images");
+
         Assert.NotNull(resultOptimized.DocumentStream);
         Assert.True(resultOptimized.DocumentStream.Length > 0);
         Assert.True(string.IsNullOrWhiteSpace(resultOptimized.Error), $"Should have no error but found {resultOptimized.Error}");
         Assert.Equal(0, resultOptimized.ExitCode);
         Assert.False(resultOptimized.HasError);
 
-        Assert.True(resultNormal.DocumentStream.Length > resultOptimized.DocumentStream.Length, $"Expected {resultNormal.DocumentStream.Length} to be greater than {resultOptimized.DocumentStream.Length}");
+        Assert.True(resultNormal.DocumentStream.Length > resultOptimized.DocumentStream.Length,
+            $"Expected {resultNormal.DocumentStream.Length} to be greater than {resultOptimized.DocumentStream.Length}");
     }
 
     [Fact]
@@ -188,7 +186,7 @@ public class PrinterTests
         var printer = GetPrinter();
         await printer.Initialize();
 
-        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
+        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Input.html"), Encoding.UTF8);
         var result = await printer.Print(html);
 
         await File.WriteAllBytesAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"), result.Bytes);
@@ -198,14 +196,14 @@ public class PrinterTests
         Assert.False(result.HasError);
         Assert.True(result.Bytes.Length > 0);
     }
-    
+
     [Fact]
     public async Task Print_RunsStreamCommand_SpecialCharacters()
     {
         var printer = GetPrinter();
         await printer.Initialize();
 
-        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot,"Expected/Print_RunsCommand_SpecialCharacters_Input.html"), System.Text.Encoding.UTF8);
+        var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Input.html"), Encoding.UTF8);
         var result = await printer.PrintStream(html);
 
         var actualBytes = (result.DocumentStream as MemoryStream)?.ToArray();
@@ -216,7 +214,6 @@ public class PrinterTests
         Assert.False(result.HasError);
         Assert.True(result.DocumentStream.Length > 0);
         Assert.True(actualBytes?.Length > 0);
-
     }
 
     [Fact]

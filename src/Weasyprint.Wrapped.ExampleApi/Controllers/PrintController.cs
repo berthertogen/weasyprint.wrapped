@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Weasyprint.Wrapped.ExampleApi.Controllers;
@@ -50,7 +49,7 @@ public class PrintController : ControllerBase
             FileDownloadName = "result.pdf"
         };
     }
-    
+
     [HttpGet(Name = "Version")]
     public async Task<IActionResult> Version()
     {

@@ -1,14 +1,13 @@
-
 namespace Weasyprint.Wrapped;
 
 public class VersionResult
 {
     public VersionResult(string version, string error, TimeSpan runTime, int exitCode)
     {
-        this.Version = version;
-        this.Error = error;
-        this.RunTime = runTime;
-        this.ExitCode = exitCode;
+        Version = version;
+        Error = error;
+        RunTime = runTime;
+        ExitCode = exitCode;
     }
 
     public bool HasError => !string.IsNullOrWhiteSpace(Error);
