@@ -1,13 +1,16 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace Weasyprint.Wrapped;
+
 public class ConfigurationProvider
 {
     protected readonly string assetsFolder;
     protected readonly string workingFolder;
     private string baseUrl = ".";
 
-    public ConfigurationProvider() : this(string.Empty, false, "weasyprinter", false) { }
+    public ConfigurationProvider() : this(string.Empty, false, "weasyprinter", false)
+    {
+    }
 
     public ConfigurationProvider(string assetsFolder, bool isAssetsAbsolute, string workingFolder, bool isWorkingAbsolute)
     {
@@ -27,7 +30,9 @@ public class ConfigurationProvider
     }
 
     public string GetWorkingFolder()
-        => workingFolder;
+    {
+        return workingFolder;
+    }
 
     public void SetBaseUrl(string baseUrl)
     {
@@ -35,5 +40,7 @@ public class ConfigurationProvider
     }
 
     public string GetBaseUrl()
-        => baseUrl;
+    {
+        return baseUrl;
+    }
 }
