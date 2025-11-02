@@ -4,6 +4,7 @@ using System.Text;
 using System;
 using CliWrap;
 using CliWrap.Buffered;
+using System.Linq;
 
 namespace Weasyprint.Wrapped;
 
