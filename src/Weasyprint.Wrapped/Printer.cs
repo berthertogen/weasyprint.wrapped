@@ -152,8 +152,8 @@ public class Printer
   private static void IgnoreCertainErrors(StringBuilder stdErrBuffer)
   {
     // Remove all lines containing 'test' from stdErrBuffer
-    var filteredStdErr = stdErrBuffer.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
-      .Where(line => !line.Contains("GLib-GIO-WARNING", StringComparison.OrdinalIgnoreCase))
+    var filteredStdErr = stdErrBuffer.ToString().Split([Environment.NewLine], StringSplitOptions.None)
+      .Where(line => line.IndexOf("GLib-GIO-WARNING", StringComparison.OrdinalIgnoreCase) < 0)
       .ToArray();
     stdErrBuffer.Clear();
     stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
