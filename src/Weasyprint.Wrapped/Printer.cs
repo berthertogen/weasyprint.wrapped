@@ -193,6 +193,8 @@ public class Printer
                       .WithValidation(CommandResultValidation.None)
                       .ExecuteBufferedAsync(Encoding.UTF8);
 
+    IgnoreCertainErrors(stdErrBuffer);
+    
     return new VersionResult(
                              stdOutBuffer.ToString(),
                              stdErrBuffer.ToString(),
