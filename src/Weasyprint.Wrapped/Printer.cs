@@ -112,12 +112,7 @@ public class Printer
 
     outputStream.Seek(0, SeekOrigin.Begin);
 
-    // Remove all lines containing 'test' from stdErrBuffer
-    var filteredStdErr = stdErrBuffer.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
-                          .Where(line => !line.Contains("GLib-GIO-WARNING", StringComparison.OrdinalIgnoreCase))
-                          .ToArray();
-    stdErrBuffer.Clear();
-    stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
+    IgnoreCertainErrors(stdErrBuffer);
 
     return new PrintStreamResult(
                                  outputStream,
@@ -142,13 +137,25 @@ public class Printer
                       .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                       .WithValidation(CommandResultValidation.None)
                       .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
-
+    
+    IgnoreCertainErrors(stdErrBuffer);
+    
     return new PrintResult(
                            Array.Empty<byte>(),
                            stdErrBuffer.ToString(),
                            result.RunTime,
                            result.ExitCode
                           );
+  }
+
+  private static void IgnoreCertainErrors(StringBuilder stdErrBuffer)
+  {
+    // Remove all lines containing 'test' from stdErrBuffer
+    var filteredStdErr = stdErrBuffer.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
+      .Where(line => !line.Contains("GLib-GIO-WARNING", StringComparison.OrdinalIgnoreCase))
+      .ToArray();
+    stdErrBuffer.Clear();
+    stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
   }
 
   private Command BuildOsSpecificCommand()
