@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
+using System;
 using CliWrap;
 using CliWrap.Buffered;
 
@@ -110,6 +111,13 @@ public class Printer
                       .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
 
     outputStream.Seek(0, SeekOrigin.Begin);
+
+    // Remove all lines containing 'test' from stdErrBuffer
+    var filteredStdErr = stdErrBuffer.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)
+                          .Where(line => !line.Contains("GLib-GIO-WARNING", StringComparison.OrdinalIgnoreCase))
+                          .ToArray();
+    stdErrBuffer.Clear();
+    stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
 
     return new PrintStreamResult(
                                  outputStream,
