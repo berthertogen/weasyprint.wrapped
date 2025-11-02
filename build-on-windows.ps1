@@ -1,6 +1,6 @@
 $workingDir = "./standalone-windows-64";
 $assets = "./assets";
-$version = "weasyprint==62.3"
+$version = "weasyprint==66.0"
 
 if (Test-Path $workingDir) {
     Write-Host "*** Cleaning $workingDir"
@@ -33,7 +33,8 @@ Remove-Item "$workingDir/python.tar.gz" -Recurse -Force | Out-Null
 
 Set-Location  "$workingDir/python"
 Write-Host "*** Installing $version"
-$Env:PATH = "$workingDir/gtk3;$Env:PATH"
+$Env:PATH = "$workingDir\gtk3;$Env:PATH"
+$Env:WEASYPRINT_DLL_DIRECTORIES = "$workingDir\gtk3;$Env:WEASYPRINT_DLL_DIRECTORIES"
 Invoke-Expression ".\python.exe -m pip install $version"
 Write-Host "*** Testing weasyprint"
 Invoke-Expression ".\python.exe -m weasyprint --info"
