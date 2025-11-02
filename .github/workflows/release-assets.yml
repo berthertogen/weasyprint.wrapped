@@ -40,10 +40,12 @@ jobs:
           workflow_conclusion: success
       - name: Add version files
         run: |
-          cd assets
+          cd assets-linux
           touch version-${{ steps.set_version.outputs.tag-no-v }}
           zip -d standalone-linux-64.zip "version-*"
           zip -ur standalone-linux-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
+          cd ../assets-windows
+          touch version-${{ steps.set_version.outputs.tag-no-v }}
           zip -d standalone-windows-64.zip "version-*"
           zip -ur standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
       - name: Create nuget package
@@ -73,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: assets/standalone-linux-64.zip
+          asset_path: assets-linux/standalone-linux-64.zip
           asset_name: standalone-linux-64.zip
           asset_content_type: application/zip
       - name: Upload release asset windows
@@ -82,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: assets/standalone-windows-64.zip
+          asset_path: assets-windows/standalone-windows-64.zip
           asset_name: standalone-windows-64.zip
           asset_content_type: application/zip
 
