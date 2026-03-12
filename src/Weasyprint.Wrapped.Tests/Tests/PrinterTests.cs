@@ -224,7 +224,7 @@ public class PrinterTests
 
         var result = await printer.Version();
 
-        Assert.Contains("WeasyPrint version: 66.0", result.Version);
+        Assert.Contains("WeasyPrint version: 68.1", result.Version);
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
