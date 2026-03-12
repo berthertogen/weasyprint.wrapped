@@ -19,37 +19,37 @@ jobs:
         language: [ 'csharp' ]
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
     - name: Build
       run: dotnet build --verbosity normal /p:UseSharedCompilation=false
       working-directory: ./src/Weasyprint.Wrapped
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
   build-assets-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Build asset
         shell: pwsh
         run: ./build-on-windows.ps1
       - name: Upload asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: assets-windows
           path: ./assets/standalone-windows-64.zip
   build-assets-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Build asset
         shell: bash
         run: ./build-on-linux.sh
       - name: Upload asset
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: assets-linux
           path: ./assets/standalone-linux-64.zip
@@ -67,12 +67,12 @@ jobs:
             artifact: assets-linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Setup .NET Core SDK 8.x
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 8.x
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: ${{ matrix.artifact }}
           path: assets
