@@ -28,6 +28,22 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="../../assets-windows/*.*">
+            <Pack>true</Pack>
+            <PackagePath>contentFiles\any\any</PackagePath>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="../../assets-linux/*.*">
+            <Pack>true</Pack>
+            <PackagePath>contentFiles\any\any</PackagePath>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="CliWrap" Version="3.9.0"/>
         <!-- <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" /> -->
     </ItemGroup>
