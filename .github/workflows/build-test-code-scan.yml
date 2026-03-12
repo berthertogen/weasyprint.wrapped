@@ -72,7 +72,7 @@ jobs:
       - name: Setup .NET Core SDK 8.x
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
       - uses: actions/download-artifact@v8
         with:
           name: ${{ matrix.artifact }}
