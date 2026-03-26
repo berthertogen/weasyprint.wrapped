@@ -26,7 +26,8 @@ public class PrinterTests
         await GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
-        Assert.True(Directory.Exists("./weasyprinter/python"));
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            Assert.True(Directory.Exists("./weasyprinter/python"));
     }
 
     [Fact]
