@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Weasyprint.Wrapped" Version="0.0.26"/>
+        <PackageReference Include="Weasyprint.Wrapped" Version="9.0.0" />
     </ItemGroup>
 
 </Project>
