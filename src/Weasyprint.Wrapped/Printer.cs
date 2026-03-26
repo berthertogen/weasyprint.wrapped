@@ -94,8 +94,7 @@ public class Printer
     {
         var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
+        var result = await BuildOsSpecificCommandWithArguments($"- - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
@@ -124,8 +123,7 @@ public class Printer
     public async Task<PrintResult> Print(string htmlFile, string pdfFile, CancellationToken cancellationToken = default, params string[] additionalParameters)
     {
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
+        var result = await BuildOsSpecificCommandWithArguments($"--encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
@@ -150,32 +148,29 @@ public class Printer
         stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
     }
 
-    private Command BuildOsSpecificCommand()
+    private Command BuildOsSpecificCommandWithArguments(string arguments = "")
     {
         Command command;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             command = Cli
-                .Wrap($"{workingFolder}/python/python.exe")
-                .WithWorkingDirectory($"{workingFolder}/python")
-                .WithEnvironmentVariables(env =>
-                {
-                    env.Set("PATH", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("PATH")}");
-                    env.Set("WEASYPRINT_DLL_DIRECTORIES", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("WEASYPRINT_DLL_DIRECTORIES")}");
-                });
+                .Wrap($"{workingFolder}/weasyprint.exe")
+                .WithWorkingDirectory($"{workingFolder}");
         else
             command = Cli
                 .Wrap($"{workingFolder}/python/bin/python3.10")
                 .WithWorkingDirectory($"{workingFolder}/python/bin/");
 
-        return command;
+        if (string.IsNullOrWhiteSpace(arguments))
+            return command;
+
+        return command.WithArguments(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? arguments : $"-m weasyprint {arguments}");
     }
 
     public async Task<VersionResult> Version()
     {
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommand()
-            .WithArguments("-m weasyprint --info")
+        var result = await BuildOsSpecificCommandWithArguments("--info")
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
