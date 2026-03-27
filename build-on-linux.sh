@@ -1,37 +1,154 @@
-workingDir="./standalone-linux-64";
-assets="./assets";
-version=weasyprint==68.1
+#!/bin/bash
+set -e  # End the script at errors
 
-if [ -d "$workingDir" ]; then
-  echo "*** Cleaning $workingDir"
-  rm -rf $workingDir
+# ============================================
+# WeasyPrint Portable Build Script
+# ============================================
+
+BUILD_DIR="weasyprint-build"
+OUTPUT_NAME="weasyprint-linux"
+DOCKER_IMAGE="ubuntu:22.04"
+LOG_FILE="build.log"
+ASSETS_DIR="assets"
+VERSION="weasyprint==68.1"
+
+echo "🔧 WeasyPrint Portable Builder (Debug)"
+echo "======================================"
+echo ""
+
+# 1. Prepare build and assets directory
+echo "[1/7] Prepare directories..."
+if [ -d "$BUILD_DIR" ]; then
+    echo "   ⚠️  Existing directory will be deleted..."
+    rm -rf "$BUILD_DIR"
+fi
+mkdir -p "$BUILD_DIR"
+
+if [ -d "$ASSETS_DIR" ]; then
+    echo "   ⚠️  Existing directory will be deleted..."
+    rm -rf "$ASSETS_DIR"
+fi
+mkdir -p "$ASSETS_DIR"
+
+cd "$BUILD_DIR"
+
+# 2. Create wrapper script
+echo "[2/7] Create wrapper script..."
+cat > run_weasyprint.py << 'EOF'
+#!/usr/bin/env python3
+import sys
+from weasyprint.__main__ import main
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# 3. Start docker container
+echo "[3/7] Start docker container..."
+echo "   Please wait... (could take some time)"
+
+# docker command with output and error handling
+docker run --rm \
+    -v "$(pwd)":/build \
+    -w /build \
+    -e DEBIAN_FRONTEND=noninteractive \
+    "$DOCKER_IMAGE" \
+    bash -c '
+    set -e
+    
+    echo ">>> Step 1: System update..."
+    apt-get update
+    
+    echo ">>> Step 2: Install system dependencies..."
+    apt-get install -y \
+        python3 \
+        python3-pip \
+        python3-venv \
+        build-essential \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libgdk-pixbuf2.0-0 \
+        libffi-dev \
+        shared-mime-info \
+        git \
+        ca-certificates
+    
+    echo ">>> Step 3: Create virt environment..."
+    python3 -m venv venv
+    source venv/bin/activate
+    
+    echo ">>> Step 4: Update pip..."
+    pip install --upgrade pip
+    
+    echo ">>> Step 5: Install WeasyPrint und PyInstaller..."
+    pip install weasyprint pyinstaller
+    
+    echo ">>> Step 6: Check and adjust imports..."
+    WEASYPRINT_MAIN=$(find venv -name "__main__.py" -path "*/weasyprint/*" | head -1)
+    if [ -f "$WEASYPRINT_MAIN" ]; then
+        echo "   Found: $WEASYPRINT_MAIN"
+        sed -i "s/^from \. /from weasyprint /" "$WEASYPRINT_MAIN"
+        sed  -i "s/^from \./from weasyprint\./" "$WEASYPRINT_MAIN"
+    else
+        echo "   WARNING: __main__.py nicht gefunden!"
+    fi
+    
+    echo ">>> Step 7: Build PyInstaller..."
+    pyinstaller --onefile --name weasyprint run_weasyprint.py
+    
+    echo ">>> Step 8: Check result..."
+    if [ -f "dist/weasyprint" ]; then
+        ls -lh dist/weasyprint
+        cp dist/weasyprint /build/'"$OUTPUT_NAME"'
+        echo ">>> SUCCESS: File was created!"
+    else
+        echo ">>> ERROR: dist/weasyprint does not exists!"
+        exit 1
+    fi
+    '
+
+# 4. Check if file exists
+echo "[4/7] Check if file exists..."
+if [ ! -f "$OUTPUT_NAME" ]; then
+    echo "❌ ERROR: The file $OUTPUT_NAME was not created!"
+    echo ""
+    echo "Possible reasons:"
+    echo "  1. Docker run was not correct"
+    echo "  2. apt-get or pip install failed"
+    echo "  3. PyInstaller build failed"
+    echo ""
+    echo "Check the docker output above for details."
+    exit 1
 fi
 
-echo "*** Creating $workingDir"
-mkdir $workingDir
-
-if [ -d "$assets" ]; then
-  echo "*** Creating $assets"
-  rm -rf $assets
+# 5. Short test
+echo "[5/7] Output version..."
+if ./"$OUTPUT_NAME" --version 2>&1; then
+    echo "✅ Version test passed!"
+else
+    echo "⚠️ Version test failed (maybe because of missing system libraries)"
+    exit 1
 fi
 
-echo "*** Creating $assets"
-mkdir $assets
+echo ""
+echo "============================================"
+echo "✅ Build finished!"
+echo "   Size: $(du -h "$OUTPUT_NAME" | cut -f1)"
+echo ""
+echo "📝 Usage:"
+echo "   ./$OUTPUT_NAME input.html output.pdf"
+echo "============================================"
 
-echo "*** Downloading python (https://github.com/indygreg/python-build-standalone)"
-wget -O $workingDir/python.tar.gz 'https://github.com/indygreg/python-build-standalone/releases/download/20220502/cpython-3.10.4+20220502-x86_64-unknown-linux-gnu-install_only.tar.gz'
-tar -xvzf $workingDir/python.tar.gz -C $workingDir
-rm $workingDir/python.tar.gz
+cp $OUTPUT_NAME ../
 
-cd $workingDir/python/bin/
-./python3.10 -m pip install $version 2> /dev/null
-./python3.10 -m weasyprint --info
+echo "[6/7] Creating version file..."
+cd ..
+touch "version-$VERSION"
 
-echo "*** Version=$version"
-cd ../../
-touch "version-$version"
-echo "cd python/bin/
-./python3.10 -m weasyprint - - --encoding utf8" >> print.sh
+echo "[7/7] Creating archive $ASSETS_DIR/standalone-linux-64.zip..."
+zip "./$ASSETS_DIR/standalone-linux-64.zip" "version-$VERSION" "$OUTPUT_NAME"
 
-echo "*** Create archive $assets/standalone-linux-64.zip"
-zip -r "../$assets/standalone-linux-64.zip" .
+# Cleanup
+echo "Cleanup..."
+rm "$OUTPUT_NAME" "version-$VERSION"
+

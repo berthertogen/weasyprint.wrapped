@@ -157,13 +157,13 @@ public class Printer
                 .WithWorkingDirectory($"{workingFolder}");
         else
             command = Cli
-                .Wrap($"{workingFolder}/python/bin/python3.10")
-                .WithWorkingDirectory($"{workingFolder}/python/bin/");
+                .Wrap($"{workingFolder}/weasyprint-linux")
+                .WithWorkingDirectory($"{workingFolder}");
 
         if (string.IsNullOrWhiteSpace(arguments))
             return command;
 
-        return command.WithArguments(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? arguments : $"-m weasyprint {arguments}");
+        return command.WithArguments(arguments);
     }
 
     public async Task<VersionResult> Version()
