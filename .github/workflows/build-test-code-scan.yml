@@ -77,6 +77,11 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
+      - name: Install deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0   
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests

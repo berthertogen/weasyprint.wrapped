@@ -81,7 +81,7 @@ docker run --rm \
     pip install --upgrade pip
     
     echo ">>> Step 5: Install WeasyPrint und PyInstaller..."
-    pip install weasyprint pyinstaller
+    pip install '"$VERSION"' pyinstaller
     
     echo ">>> Step 6: Check and adjust imports..."
     WEASYPRINT_MAIN=$(find venv -name "__main__.py" -path "*/weasyprint/*" | head -1)
@@ -90,7 +90,7 @@ docker run --rm \
         sed -i "s/^from \. /from weasyprint /" "$WEASYPRINT_MAIN"
         sed  -i "s/^from \./from weasyprint\./" "$WEASYPRINT_MAIN"
     else
-        echo "   WARNING: __main__.py nicht gefunden!"
+        echo "   WARNING: __main__.py not found!"
     fi
     
     echo ">>> Step 7: Build PyInstaller..."
@@ -122,11 +122,16 @@ if [ ! -f "$OUTPUT_NAME" ]; then
 fi
 
 # 5. Short test
-echo "[5/7] Output version..."
-if ./"$OUTPUT_NAME" --version 2>&1; then
-    echo "✅ Version test passed!"
+echo "[5/7] Output version (inside Docker)..."
+if docker run --rm \
+    -e OUTPUT_NAME="$OUTPUT_NAME" \
+    -v "$PWD":/build \
+    -w /build \
+    "$DOCKER_IMAGE" \
+    /bin/bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 >/dev/null 2>&1 && "./$OUTPUT_NAME" --version'; then
+    echo "✅ Version test passed inside Docker!"
 else
-    echo "⚠️ Version test failed (maybe because of missing system libraries)"
+    echo "⚠️ Version test failed (maybe because of missing system libraries in Docker image)"
     exit 1
 fi
 
