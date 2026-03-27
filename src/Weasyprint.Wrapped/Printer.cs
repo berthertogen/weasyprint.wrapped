@@ -94,7 +94,8 @@ public class Printer
     {
         var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommandWithArguments($"- - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
+        var result = await BuildOsSpecificCommand()
+            .WithArguments($"- - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
@@ -123,7 +124,8 @@ public class Printer
     public async Task<PrintResult> Print(string htmlFile, string pdfFile, CancellationToken cancellationToken = default, params string[] additionalParameters)
     {
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommandWithArguments($"--encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
+        var result = await BuildOsSpecificCommand()
+            .WithArguments($"--encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
@@ -148,7 +150,7 @@ public class Printer
         stdErrBuffer.Append(string.Join(Environment.NewLine, filteredStdErr));
     }
 
-    private Command BuildOsSpecificCommandWithArguments(string arguments = "")
+    private Command BuildOsSpecificCommand()
     {
         Command command;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -160,17 +162,15 @@ public class Printer
                 .Wrap($"{workingFolder}/weasyprint-linux")
                 .WithWorkingDirectory($"{workingFolder}");
 
-        if (string.IsNullOrWhiteSpace(arguments))
-            return command;
-
-        return command.WithArguments(arguments);
+        return command;
     }
 
     public async Task<VersionResult> Version()
     {
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
-        var result = await BuildOsSpecificCommandWithArguments("--info")
+        var result = await BuildOsSpecificCommand()
+            .WithArguments("--info")
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
