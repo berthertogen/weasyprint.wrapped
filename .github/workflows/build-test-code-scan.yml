@@ -77,16 +77,24 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
-      - name: Install deps (Linux)
+      - name: Configure Font Environment for Tests
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libcairo2-dev fonts-dejavu-core fonts-liberation fonts-noto-core fonts-lato
+          # Create a writable font config directory for the test user
+          mkdir -p /tmp/fontconfig-cache
+          chmod 777 /tmp/fontconfig-cache
+            
+          # Export environment variables to force fontconfig to use this writable dir
+          # This prevents the app from trying to write to /usr/share/fonts
+          echo "FONTCONFIG_PATH=/tmp/fontconfig-cache" >> $GITHUB_ENV
+          echo "XDG_CACHE_HOME=/tmp" >> $GITHUB_ENV
+            
+          # Pre-generate the cache in the temp dir so the app finds it immediately
           sudo fc-cache -f -v
-          
-          # Ensure permissions are open enough for the test runner
-          sudo chmod -R a+r /usr/share/fonts
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
+        env:
+          FONTCONFIG_PATH: /tmp/fontconfig-cache
+          XDG_CACHE_HOME: /tmp
 
