@@ -77,38 +77,6 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
-      - name: Setup Writable Font Environment (Complete Override)
-        if: runner.os == 'Linux'
-        run: |
-          # 1. Create a dedicated writable font directory
-          mkdir -p /tmp/my-custom-fonts
-          chmod 777 /tmp/my-custom-fonts
-          
-          # 2. Copy all system fonts to the writable directory
-          # This ensures we have the exact same fonts but in a place we can write to
-          sudo cp -r /usr/share/fonts/* /tmp/my-custom-fonts/
-          
-          # 3. Make the copied fonts writable
-          sudo chmod -R 777 /tmp/my-custom-fonts
-          
-          # 4. Generate a font cache in the writable directory
-          # We point fontconfig to our custom dir
-          export FONTCONFIG_PATH=/tmp/my-custom-fonts
-          export XDG_CACHE_HOME=/tmp
-          fc-cache -f -v
-          
-          # 5. Set environment variables for the test
-          # We force the app to look ONLY in our writable directory
-          echo "FONTCONFIG_PATH=/tmp/my-custom-fonts" >> $GITHUB_ENV
-          echo "XDG_DATA_HOME=/tmp/my-custom-fonts" >> $GITHUB_ENV
-          echo "XDG_CACHE_HOME=/tmp" >> $GITHUB_ENV
-          
-          # 6. Verify
-          echo "Custom Font Dir:"
-          ls -ld /tmp/my-custom-fonts
-          echo "Can we write to custom dir?"
-          touch /tmp/my-custom-fonts/test_write && echo "SUCCESS" || echo "FAILED"
-          rm -f /tmp/my-custom-fonts/test_write
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
