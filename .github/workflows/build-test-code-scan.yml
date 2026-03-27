@@ -80,8 +80,4 @@ jobs:
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
-        env:
-          FONTCONFIG_PATH: /tmp/my-custom-fonts
-          XDG_DATA_HOME: /tmp/my-custom-fonts
-          XDG_CACHE_HOME: /tmp
 
