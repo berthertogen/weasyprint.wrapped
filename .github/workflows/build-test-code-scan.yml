@@ -80,16 +80,22 @@ jobs:
       - name: Configure Font Environment for Tests
         if: runner.os == 'Linux'
         run: |
-          # Create a writable font config directory for the test user
+          # 1. Create writable cache directory
           mkdir -p /tmp/fontconfig-cache
           chmod 777 /tmp/fontconfig-cache
-            
-          # Export environment variables to force fontconfig to use this writable dir
-          # This prevents the app from trying to write to /usr/share/fonts
+          
+          # 2. CRITICAL: Make source font files writable so mtime can be updated
+          # This allows the app to "touch" the files without permission errors
+          sudo chmod -R 777 /usr/share/fonts
+          
+          # 3. Remove immutable flags if they exist (rare but possible)
+          sudo chattr -i -R /usr/share/fonts 2>/dev/null || true
+          
+          # 4. Export environment variables
           echo "FONTCONFIG_PATH=/tmp/fontconfig-cache" >> $GITHUB_ENV
           echo "XDG_CACHE_HOME=/tmp" >> $GITHUB_ENV
-            
-          # Pre-generate the cache in the temp dir so the app finds it immediately
+          
+          # 5. Pre-generate cache in the temp dir
           sudo fc-cache -f -v
       - name: Test
         run: dotnet test --verbosity normal
