@@ -89,7 +89,7 @@ jobs:
           sudo cp -r /usr/share/fonts/* /tmp/my-custom-fonts/
           
           # 3. Make the copied fonts writable
-          chmod -R 777 /tmp/my-custom-fonts
+          sudo chmod -R 777 /tmp/my-custom-fonts
           
           # 4. Generate a font cache in the writable directory
           # We point fontconfig to our custom dir
