@@ -77,6 +77,23 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
+      - name: Mount fonts directory to tmpfs
+        run: |
+          # Backup fonts
+          sudo mkdir -p /tmp/fonts_backup
+          sudo cp -a /usr/share/fonts/. /tmp/fonts_backup/
+          
+          # mount tmpfs
+          sudo mount -t tmpfs -o size=200M tmpfs /usr/share/fonts
+          
+          # copy fonts back
+          sudo cp -a /tmp/fonts_backup/. /usr/share/fonts/
+          
+          # build font cache
+          sudo fc-cache -fv
+          
+          # set rights
+          sudo chmod -R 777 /usr/share/fonts
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
