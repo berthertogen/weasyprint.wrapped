@@ -77,55 +77,63 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
-      - name: Setup Isolated Font Environment
+      - name: Setup Isolated Font Environment (With Custom fonts.conf)
         if: runner.os == 'Linux'
         run: |
-          # 1. Define a static, clean path
-          ISOLATED_DIR="/tmp/weasy_fonts_static"
+          # 1. Create the font directory in the current user's home (guaranteed writable)
+          # The runner user is usually 'runner' with home at /home/runner
+          ISOLATED_DIR="/home/runner/weasy_fonts_final"
           rm -rf "$ISOLATED_DIR"
           mkdir -p "$ISOLATED_DIR"
-          chmod 777 "$ISOLATED_DIR"
-
-          # 2. Copy fonts (preserve structure)
+          # No sudo needed here, we are already the user
+          
+          # 2. Copy fonts (we need sudo to read /usr/share/fonts, but the destination is ours)
           sudo cp -r /usr/share/fonts/* "$ISOLATED_DIR/"
-          sudo chmod -R 777 "$ISOLATED_DIR"
-
-          # 3. Create cache directory explicitly
-          CACHE_DIR="$ISOLATED_DIR/.cache/fontconfig"
+          
+          # 3. Ensure ownership is correct (should be automatic, but force it)
+          sudo chown -R runner:runner "$ISOLATED_DIR"
+          sudo chmod -R 755 "$ISOLATED_DIR" # 755 is enough if we own it
+          
+          # 4. Create cache directory
+          CACHE_DIR="$ISOLATED_DIR/.cache"
           mkdir -p "$CACHE_DIR"
-          sudo chmod 777 "$CACHE_DIR"
+          sudo chown -R runner:runner "$CACHE_DIR"
+          chmod 755 "$CACHE_DIR"
 
-          # 4. Force fc-cache to use ONLY our directory
-          # We set the env vars HERE for the duration of this command
+          # 4. Create CUSTOM fonts.conf that ONLY points to our directory
+          CONF_DIR="$ISOLATED_DIR/conf.d"
+          mkdir -p "$CONF_DIR"
+          cat > "$ISOLATED_DIR/fonts.conf" << 'EOF'
+          <?xml version="1.0"?>
+          <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+          <fontconfig>
+            <dir>/home/runner/weasy_fonts_final</dir>
+            <cachedir>/home/runner/weasy_fonts_final/.cache</cachedir>
+          </fontconfig>
+          EOF
+
+          # 5. Run fc-cache with explicit config file
+          FONTCONFIG_FILE="$ISOLATED_DIR/fonts.conf" \
           FONTCONFIG_PATH="$ISOLATED_DIR" \
-          XDG_CACHE_HOME="$CACHE_DIR" \
           fc-cache -f -v
 
-          # 5. Find the actual cache file (it might be in .cache/fontconfig or .cache)
-          CACHE_FILE=$$(find "$$ISOLATED_DIR" -name "fonts.cache-2" -type f 2>/dev/null | head -n 1)
-          
-          if [ -z "$CACHE_FILE" ]; then
-            echo "ERROR: Could not find fonts.cache-2!"
-            echo "Contents of $ISOLATED_DIR:"
-            find "$ISOLATED_DIR" -type f
-            exit 1
+          # 6. Verify cache exists
+          if [ -f "$CACHE_DIR/fonts.cache-2" ]; then
+            echo "Cache file found: $CACHE_DIR/fonts.cache-2"
+          else
+            echo "Cache file NOT found. Checking other locations..."
+            find "$ISOLATED_DIR" -name "fonts.cache-2" -type f
           fi
 
-          echo "Found cache at: $CACHE_FILE"
-
-          # 6. Set environment variables for subsequent steps
-          # We set them to the ROOT of the isolated dir, fontconfig will find the cache inside
+          # 7. Set environment variables
+          echo "FONTCONFIG_FILE=$ISOLATED_DIR/fonts.conf" >> $GITHUB_ENV
           echo "FONTCONFIG_PATH=$ISOLATED_DIR" >> $GITHUB_ENV
           echo "XDG_CACHE_HOME=$CACHE_DIR" >> $GITHUB_ENV
           echo "XDG_DATA_HOME=$ISOLATED_DIR" >> $GITHUB_ENV
 
-          # 7. Verify fonts are visible
-          echo "Verifying fonts:"
-          fc-list : family 2>/dev/null | head -5 || echo "No fonts listed (might be expected if cache is new)"
+          # 8. Verify fonts are visible
+          echo "Available fonts:"
+          FONTCONFIG_FILE="$ISOLATED_DIR/fonts.conf" fc-list : family 2>/dev/null | head -5 || echo "No fonts found"
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
-        env:
-          FONTCONFIG_PATH: /tmp/weasy_fonts_static
-          XDG_DATA_HOME: /tmp/weasy_fonts_static
-          XDG_CACHE_HOME: /tmp/weasy_fonts_static/.cache
