@@ -105,9 +105,6 @@ jobs:
           echo "XDG_DATA_HOME=$ISOLATED_FONT_DIR" >> $GITHUB_ENV
           echo "XDG_CACHE_HOME=$ISOLATED_FONT_DIR/.cache" >> $GITHUB_ENV
           
-          # 6. (Optional but recommended) Unset any variables that might force system paths
-          echo "unset FONTCONFIG_FILE" >> $GITHUB_ENV
-          
           # 7. Verify isolation
           echo "Isolated Dir: $ISOLATED_FONT_DIR"
           ls -ld "$ISOLATED_FONT_DIR"
