@@ -26,7 +26,6 @@ public class PrinterTests
         await GetPrinter().Initialize();
 
         Assert.True(Directory.Exists("./weasyprinter"));
-        Assert.True(Directory.Exists("./weasyprinter/python"));
     }
 
     [Fact]
@@ -34,12 +33,13 @@ public class PrinterTests
     {
         Directory.CreateDirectory("./weasyprinter");
 
-        var timeBeforeAction = DateTime.Now;
+        var creationTimeBeforeAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        await Task.Delay(10);
         await GetPrinter().Initialize();
 
-        var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
-        var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
-        Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
+        var creationTimeAfterAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        var isCreatedAfter = creationTimeAfterAction > creationTimeBeforeAction;
+        Assert.True(isCreatedAfter, $"Should be created ({creationTimeAfterAction:HH:mm:ss.fff}) after {creationTimeBeforeAction:HH:mm:ss.fff}");
     }
 
     [Fact]
@@ -49,12 +49,13 @@ public class PrinterTests
         var fileStream = File.Create("./weasyprinter/version-somethingdifferent");
         fileStream.Close();
 
-        var timeBeforeAction = DateTime.Now;
+        var creationTimeBeforeAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        await Task.Delay(10);
         await GetPrinter().Initialize();
 
-        var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
-        var isCreatedAfter = creationTime.TimeOfDay > timeBeforeAction.TimeOfDay;
-        Assert.True(isCreatedAfter, $"Should be created ({creationTime.ToLongTimeString()}) after {timeBeforeAction.ToLongTimeString()}");
+        var creationTimeAfterAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        var isCreatedAfter = creationTimeAfterAction > creationTimeBeforeAction;
+        Assert.True(isCreatedAfter, $"Should be created ({creationTimeAfterAction:HH:mm:ss.fff}) after {creationTimeBeforeAction:HH:mm:ss.fff}");
     }
 
     [Fact]
@@ -67,12 +68,13 @@ public class PrinterTests
         var fileStream = File.Create($"./weasyprinter/{version}");
         fileStream.Close();
 
-        var timeBeforeAction = DateTime.Now;
+        var creationTimeBeforeAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        await Task.Delay(10);
         await GetPrinter().Initialize();
 
-        var creationTime = new DirectoryInfo("./weasyprinter").CreationTime;
-        var isCreatedBefore = creationTime.TimeOfDay < timeBeforeAction.TimeOfDay;
-        Assert.True(isCreatedBefore, $"Should be created ({creationTime.ToLongTimeString()}) before {timeBeforeAction.ToLongTimeString()}");
+        var creationTimeAfterAction = new DirectoryInfo("./weasyprinter").CreationTime;
+        var isCreatedBefore = creationTimeAfterAction == creationTimeBeforeAction;
+        Assert.True(isCreatedBefore, $"Should be created ({creationTimeAfterAction:HH:mm:ss.fff}) before {creationTimeBeforeAction:HH:mm:ss.fff}");
     }
 
     [Fact]

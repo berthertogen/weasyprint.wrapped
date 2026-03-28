@@ -77,7 +77,63 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: assets
+      - name: Setup Isolated Font Environment (With Custom fonts.conf)
+        if: runner.os == 'Linux'
+        run: |
+          # 1. Create the font directory in the current user's home (guaranteed writable)
+          # The runner user is usually 'runner' with home at /home/runner
+          ISOLATED_DIR="/home/runner/weasy_fonts_final"
+          rm -rf "$ISOLATED_DIR"
+          mkdir -p "$ISOLATED_DIR"
+          # No sudo needed here, we are already the user
+          
+          # 2. Copy fonts (we need sudo to read /usr/share/fonts, but the destination is ours)
+          sudo cp -r /usr/share/fonts/* "$ISOLATED_DIR/"
+          
+          # 3. Ensure ownership is correct (should be automatic, but force it)
+          sudo chown -R runner:runner "$ISOLATED_DIR"
+          sudo chmod -R 755 "$ISOLATED_DIR" # 755 is enough if we own it
+          
+          # 4. Create cache directory
+          CACHE_DIR="$ISOLATED_DIR/.cache"
+          mkdir -p "$CACHE_DIR"
+          sudo chown -R runner:runner "$CACHE_DIR"
+          chmod 755 "$CACHE_DIR"
+
+          # 4. Create CUSTOM fonts.conf that ONLY points to our directory
+          CONF_DIR="$ISOLATED_DIR/conf.d"
+          mkdir -p "$CONF_DIR"
+          cat > "$ISOLATED_DIR/fonts.conf" << 'EOF'
+          <?xml version="1.0"?>
+          <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+          <fontconfig>
+            <dir>/home/runner/weasy_fonts_final</dir>
+            <cachedir>/home/runner/weasy_fonts_final/.cache</cachedir>
+          </fontconfig>
+          EOF
+
+          # 5. Run fc-cache with explicit config file
+          FONTCONFIG_FILE="$ISOLATED_DIR/fonts.conf" \
+          FONTCONFIG_PATH="$ISOLATED_DIR" \
+          fc-cache -f -v
+
+          # 6. Verify cache exists
+          if [ -f "$CACHE_DIR/fonts.cache-2" ]; then
+            echo "Cache file found: $CACHE_DIR/fonts.cache-2"
+          else
+            echo "Cache file NOT found. Checking other locations..."
+            find "$ISOLATED_DIR" -name "fonts.cache-2" -type f
+          fi
+
+          # 7. Set environment variables
+          echo "FONTCONFIG_FILE=$ISOLATED_DIR/fonts.conf" >> $GITHUB_ENV
+          echo "FONTCONFIG_PATH=$ISOLATED_DIR" >> $GITHUB_ENV
+          echo "XDG_CACHE_HOME=$CACHE_DIR" >> $GITHUB_ENV
+          echo "XDG_DATA_HOME=$ISOLATED_DIR" >> $GITHUB_ENV
+
+          # 8. Verify fonts are visible
+          echo "Available fonts:"
+          FONTCONFIG_FILE="$ISOLATED_DIR/fonts.conf" fc-list : family 2>/dev/null | head -5 || echo "No fonts found"
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
-

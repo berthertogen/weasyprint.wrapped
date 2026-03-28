@@ -95,7 +95,7 @@ public class Printer
         var outputStream = new MemoryStream();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint - - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
+            .WithArguments($"- - --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)}")
             .WithStandardOutputPipe(PipeTarget.ToStream(outputStream))
             .WithStandardInputPipe(PipeSource.FromString(html, Encoding.UTF8))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
@@ -125,7 +125,7 @@ public class Printer
     {
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments($"-m weasyprint --encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
+            .WithArguments($"--encoding utf8 --base-url {baseUrl} {string.Join(" ", additionalParameters)} {htmlFile} {pdfFile}")
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync(Encoding.UTF8, cancellationToken);
@@ -155,17 +155,12 @@ public class Printer
         Command command;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             command = Cli
-                .Wrap($"{workingFolder}/python/python.exe")
-                .WithWorkingDirectory($"{workingFolder}/python")
-                .WithEnvironmentVariables(env =>
-                {
-                    env.Set("PATH", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("PATH")}");
-                    env.Set("WEASYPRINT_DLL_DIRECTORIES", $"{new FileInfo($"{workingFolder}/gtk3").FullName};{Environment.GetEnvironmentVariable("WEASYPRINT_DLL_DIRECTORIES")}");
-                });
+                .Wrap($"{workingFolder}/weasyprint.exe")
+                .WithWorkingDirectory($"{workingFolder}");
         else
             command = Cli
-                .Wrap($"{workingFolder}/python/bin/python3.10")
-                .WithWorkingDirectory($"{workingFolder}/python/bin/");
+                .Wrap($"{workingFolder}/weasyprint-linux")
+                .WithWorkingDirectory($"{workingFolder}");
 
         return command;
     }
@@ -175,7 +170,7 @@ public class Printer
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
         var result = await BuildOsSpecificCommand()
-            .WithArguments("-m weasyprint --info")
+            .WithArguments("--info")
             .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
             .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
             .WithValidation(CommandResultValidation.None)
