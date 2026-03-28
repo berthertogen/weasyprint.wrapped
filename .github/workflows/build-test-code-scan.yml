@@ -80,34 +80,48 @@ jobs:
       - name: Setup Isolated Font Environment
         if: runner.os == 'Linux'
         run: |
-          # Use a static, predictable path to avoid race conditions
+          # 1. Define a static, clean path
           ISOLATED_DIR="/tmp/weasy_fonts_static"
           rm -rf "$ISOLATED_DIR"
           mkdir -p "$ISOLATED_DIR"
           chmod 777 "$ISOLATED_DIR"
 
-          # 1. Copy structure
+          # 2. Copy fonts (preserve structure)
           sudo cp -r /usr/share/fonts/* "$ISOLATED_DIR/"
           sudo chmod -R 777 "$ISOLATED_DIR"
 
-          # 2. Generate cache with correct env vars
-          export FONTCONFIG_PATH="$ISOLATED_DIR"
-          export XDG_CACHE_HOME="$ISOLATED_DIR/.cache"
-          mkdir -p "$XDG_CACHE_HOME"
+          # 3. Create cache directory explicitly
+          CACHE_DIR="$ISOLATED_DIR/.cache/fontconfig"
+          mkdir -p "$CACHE_DIR"
+          sudo chmod 777 "$CACHE_DIR"
+
+          # 4. Force fc-cache to use ONLY our directory
+          # We set the env vars HERE for the duration of this command
+          FONTCONFIG_PATH="$ISOLATED_DIR" \
+          XDG_CACHE_HOME="$CACHE_DIR" \
           fc-cache -f -v
 
-          # 3. Verify cache exists
-          if [ ! -f "$$ISOLATED_DIR/.cache/fonts.cache-2" ] && [ ! -f "$$ISOLATED_DIR/fonts.cache-2" ]; then
-            echo "ERROR: Font cache was not generated!"
-            ls -la "$ISOLATED_DIR"
+          # 5. Find the actual cache file (it might be in .cache/fontconfig or .cache)
+          CACHE_FILE=$$(find "$$ISOLATED_DIR" -name "fonts.cache-2" -type f 2>/dev/null | head -n 1)
+          
+          if [ -z "$CACHE_FILE" ]; then
+            echo "ERROR: Could not find fonts.cache-2!"
+            echo "Contents of $ISOLATED_DIR:"
+            find "$ISOLATED_DIR" -type f
             exit 1
           fi
 
-          # 4. Set global env vars
-          echo "FONTCONFIG_PATH=$ISOLATED_DIR" >> $GITHUB_ENV
-          echo "XDG_DATA_HOME=$ISOLATED_DIR" >> $GITHUB_ENV
-          echo "XDG_CACHE_HOME=$ISOLATED_DIR/.cache" >> $GITHUB_ENV
+          echo "Found cache at: $CACHE_FILE"
 
+          # 6. Set environment variables for subsequent steps
+          # We set them to the ROOT of the isolated dir, fontconfig will find the cache inside
+          echo "FONTCONFIG_PATH=$ISOLATED_DIR" >> $GITHUB_ENV
+          echo "XDG_CACHE_HOME=$CACHE_DIR" >> $GITHUB_ENV
+          echo "XDG_DATA_HOME=$ISOLATED_DIR" >> $GITHUB_ENV
+
+          # 7. Verify fonts are visible
+          echo "Verifying fonts:"
+          fc-list : family 2>/dev/null | head -5 || echo "No fonts listed (might be expected if cache is new)"
       - name: Test
         run: dotnet test --verbosity normal
         working-directory: ./src/Weasyprint.Wrapped.Tests
