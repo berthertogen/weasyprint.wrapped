@@ -26,7 +26,8 @@ public class Printer
 
     public async Task Initialize()
     {
-        var version = ZipFile.OpenRead(asset).Entries.Single(e => e.Name.StartsWith("version-")).Name;
+        using var zipArchive = ZipFile.OpenRead(asset);
+        var version = zipArchive.Entries.Single(e => e.Name.StartsWith("version-")).Name;
         if (File.Exists(Path.Combine(workingFolder, version))) return;
 
         if (Directory.Exists(workingFolder)) Directory.Delete(workingFolder, true);
