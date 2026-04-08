@@ -94,12 +94,12 @@ docker run --rm \
     fi
     
     echo ">>> Step 7: Build PyInstaller..."
-    pyinstaller --onefile --name weasyprint run_weasyprint.py
+    pyinstaller --onedir --name weasyprint run_weasyprint.py
     
     echo ">>> Step 8: Check result..."
-    if [ -f "dist/weasyprint" ]; then
+    if [ -d "dist/weasyprint" ]; then
         ls -lh dist/weasyprint
-        cp dist/weasyprint /build/'"$OUTPUT_NAME"'
+        cp -rv dist/weasyprint /build/'"$OUTPUT_NAME"'
         echo ">>> SUCCESS: File was created!"
     else
         echo ">>> ERROR: dist/weasyprint does not exists!"
@@ -109,7 +109,7 @@ docker run --rm \
 
 # 4. Check if file exists
 echo "[4/7] Check if file exists..."
-if [ ! -f "$OUTPUT_NAME" ]; then
+if [ ! -d "$OUTPUT_NAME" ]; then
     echo "❌ ERROR: The file $OUTPUT_NAME was not created!"
     echo ""
     echo "Possible reasons:"
@@ -128,7 +128,7 @@ if docker run --rm \
     -v "$PWD":/build \
     -w /build \
     "$DOCKER_IMAGE" \
-    /bin/bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 >/dev/null 2>&1 && "./$OUTPUT_NAME" --version'; then
+    /bin/bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 >/dev/null 2>&1 && "./$OUTPUT_NAME/weasyprint" --info'; then
     echo "✅ Version test passed inside Docker!"
 else
     echo "⚠️ Version test failed (maybe because of missing system libraries in Docker image)"
@@ -144,16 +144,16 @@ echo "📝 Usage:"
 echo "   ./$OUTPUT_NAME input.html output.pdf"
 echo "============================================"
 
-cp $OUTPUT_NAME ../
+cp -r $OUTPUT_NAME ../
 
 echo "[6/7] Creating version file..."
 cd ..
 touch "version-$VERSION"
 
 echo "[7/7] Creating archive $ASSETS_DIR/standalone-linux-64.zip..."
-zip "./$ASSETS_DIR/standalone-linux-64.zip" "version-$VERSION" "$OUTPUT_NAME"
+zip -r "./$ASSETS_DIR/standalone-linux-64.zip" "version-$VERSION" "$OUTPUT_NAME"
 
 # Cleanup
 echo "Cleanup..."
-rm "$OUTPUT_NAME" "version-$VERSION"
+rm -r "$OUTPUT_NAME" "version-$VERSION"
 
