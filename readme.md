@@ -157,16 +157,23 @@ Check here for the answer: <https://stackoverflow.com/questions/67607643/what-do
 
 ### Windows (build-on-windows.ps1 does approximately this)
 
-* Download the Windows standalone binary https://github.com/Kozea/WeasyPrint/releases
-* Pack it into the resources zip for Windows
+Basically it does the same thing as the original exe generation of weasyprint does (https://github.com/Kozea/WeasyPrint/blob/main/.github/workflows/exe.yml), but wrapped into a ps1 script and generating a one directory solution instead a one file solution. Here are the steps:
+
+* Installing a msys2 environment (https://www.msys2.org)
+* Installing python3 (https://github.com/indygreg/python-build-standalone) and all the dependencies
+* Installing weasyprint and pyinstaller using pip
+* Use pyinstaller to create a standalone executable for Windows (https://pyinstaller.org/en/stable/usage.html#cmdoption-D)
+* Get rid of the python and msys2 files for testing
+* Chek the newly created executable to make sure it works and has all the needed dependencies
+* Pack the executable into the resources zip for Windows
 
 ### Linux (build-on-linux.ps1 does approximately this)
 
 * Starting a docker image with an Ubunut 22.04
 * Update the image to the latest packages
 * Installing python3 and all the dependencies for weasyprint inside the docker image
-* Install weasyprint and pyinstaller using pip
-* Use pyinstaller to create a standalone executable for Linux (https://pyinstaller.org/en/stable/usage.html#creating-a-one-file-bundle)
+* Installing weasyprint and pyinstaller using pip
+* Use pyinstaller to create a standalone executable for Linux (https://pyinstaller.org/en/stable/usage.html#cmdoption-D)
 * Chek the newly created executable in a new clean docker image to make sure it works and has all the needed dependencies
 * Pack the executable into the resources zip for Linux
 
