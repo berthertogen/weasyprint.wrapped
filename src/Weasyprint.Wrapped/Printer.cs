@@ -156,12 +156,12 @@ public class Printer
         Command command;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             command = Cli
-                .Wrap($"{workingFolder}/weasyprint.exe")
-                .WithWorkingDirectory($"{workingFolder}");
+                .Wrap($"{workingFolder}/weasyprint-windows/weasyprint.exe")
+                .WithWorkingDirectory($"{workingFolder}/weasyprint-windows");
         else
             command = Cli
-                .Wrap($"{workingFolder}/weasyprint-linux")
-                .WithWorkingDirectory($"{workingFolder}");
+                .Wrap($"{workingFolder}/weasyprint-linux/weasyprint")
+                .WithWorkingDirectory($"{workingFolder}/weasyprint-linux");
 
         return command;
     }
