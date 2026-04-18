@@ -220,8 +220,8 @@ public class PrinterTests
     [Fact]
     public async Task Initialize_ThrowsHelpfulError_WhenAssetMissing()
     {
-        var missingAssetPath = Path.Combine(testingProjectRoot, "assets", "this-file-does-not-exist.zip");
-        var config = new ConfigurationProvider(missingAssetPath, true, "weasyprinter", false);
+        var missingAssetsFolder = Path.Combine(testingProjectRoot, "assets", "this-directory-does-not-exist");
+        var config = new ConfigurationProvider(missingAssetsFolder, true, "weasyprinter", false);
         var printer = new Printer(config);
 
         var exception = await Assert.ThrowsAsync<InitializeException>(() => printer.Initialize());

@@ -59,9 +59,16 @@ public class Printer
 
             if (File.Exists(Path.Combine(workingFolder, version)) && IsRuntimeBinariesPresent()) return;
 
-            if (Directory.Exists(workingFolder)) Directory.Delete(workingFolder, true);
+            try
+            {
+                if (Directory.Exists(workingFolder)) Directory.Delete(workingFolder, true);
 
-            Directory.CreateDirectory(workingFolder);
+                Directory.CreateDirectory(workingFolder);
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                throw new InitializeException($"Failed preparing working folder '{workingFolder}'.", ex);
+            }
 
             try
             {
@@ -87,6 +94,7 @@ public class Printer
                     })
                     .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                     .WithWorkingDirectory(workingFolder)
+                    .WithValidation(CommandResultValidation.None)
                     .ExecuteAsync();
 
                 if (command.ExitCode != 0 || stdErrBuffer.Length > 0) throw new InitializeException(command, stdErrBuffer.ToString());
