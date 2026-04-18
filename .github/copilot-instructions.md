@@ -7,11 +7,11 @@
 - Consumer samples: `Weasyprint.Wrapped.Example` and `Weasyprint.Wrapped.ExampleApi`
 
 ## Key architecture and flow
-- `Printer` is the core API (`Printer.cs`):
+- `Printer` is the core API (`src/Weasyprint.Wrapped/Printer.cs`):
   - `Initialize()` extracts OS-specific standalone WeasyPrint assets from zip into a working folder.
   - `Print(...)` and `PrintStream(...)` execute the extracted binary using `CliWrap`.
   - `Version()` calls `--info` on the binary.
-- `ConfigurationProvider` resolves:
+- `ConfigurationProvider` (`src/Weasyprint.Wrapped/Configuration/ConfigurationProvider.cs`) resolves:
   - Asset zip location (`standalone-windows-64.zip` or `standalone-linux-64.zip`)
   - Working folder location (default `weasyprinter` under app base directory)
   - Base URL used by print commands.
@@ -38,18 +38,18 @@ Observed while running tests in a fresh clone:
 - `System.IO.DirectoryNotFoundException: Could not find a part of the path '.../assets/standalone-linux-64.zip'`
 - `Test Run Failed. Total tests: 12, Failed: 12`
 
-### Work-around
+### Workaround
 - Generate Linux asset zip before testing:
 
 ```bash
-cd <repository-root>
+# run from repository root
 ./build-on-linux.sh
 ```
 
 - For Windows asset generation (when needed on Windows runners):
 
 ```powershell
-cd <repository-root>
+# run from repository root
 ./build-on-windows.ps1
 ```
 
@@ -67,7 +67,7 @@ cd <repository-root>
   - `src/Weasyprint.Wrapped/Printer.cs`
   - `src/Weasyprint.Wrapped/Configuration/ConfigurationProvider.cs`
   - `src/Weasyprint.Wrapped.Tests/Tests/PrinterTests.cs`
-- Preserve cross-platform behavior (`RuntimeInformation.IsOSPlatform`) and asset naming conventions (`standalone-{env}-64.zip`).
+- Preserve cross-platform behavior (`RuntimeInformation.IsOSPlatform`) and asset naming conventions (`standalone-{os}-64.zip` where `{os}` is `windows` or `linux`).
 - When modifying command execution in `Printer`, keep `CommandResultValidation.None` and stderr filtering behavior in mind (`GLib-GIO-WARNING` is intentionally ignored).
 - Avoid changing asset folder conventions unless tests and packaging content entries in `Weasyprint.Wrapped.csproj` are updated consistently.
 
