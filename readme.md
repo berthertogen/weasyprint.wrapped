@@ -131,7 +131,7 @@ Windows:
 Linux (docker is needed):
 
 ```
-.\build-on-linux.ps1
+./build-on-linux.sh
 ```
 
 Create package:
@@ -141,7 +141,7 @@ cd .\src\Weasyprint.Wrapped\
 dotnet pack -p:PackageVersion=0.0.25 --output nupkgs
 ```
 
-Update the example project package version (Weasyprint.Wrapped.Example.csproj) and run the example to test it
+The sample projects use a local project reference to `Weasyprint.Wrapped`, so you can run them directly after building.
 
 ## Error in tests
 
@@ -167,7 +167,7 @@ Basically it does the same thing as the original exe generation of weasyprint do
 * Chek the newly created executable to make sure it works and has all the needed dependencies
 * Pack the executable into the resources zip for Windows
 
-### Linux (build-on-linux.ps1 does approximately this)
+### Linux (build-on-linux.sh does approximately this)
 
 * Starting a docker image with an Ubunut 22.04
 * Update the image to the latest packages
