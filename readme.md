@@ -141,7 +141,7 @@ cd .\src\Weasyprint.Wrapped\
 dotnet pack -p:PackageVersion=0.0.25 --output nupkgs
 ```
 
-The sample projects use a local project reference to `Weasyprint.Wrapped`, so you can run them directly after building.
+The sample projects use a local project reference to `Weasyprint.Wrapped`. Building the solution does not automatically copy the generated `assets/standalone-*.zip` files into the sample app output, so before running the samples you should first run the appropriate asset build script above and ensure the generated zip is copied to the sample output directory.
 
 ## Error in tests
 
