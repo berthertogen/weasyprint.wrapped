@@ -6,11 +6,13 @@ namespace Weasyprint.Wrapped.ExampleApi.Controllers;
 [Route("[controller]/[action]")]
 public class PrintController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<PrintController> _logger;
+    private readonly Printer _printer;
 
-    public PrintController(ILogger<WeatherForecastController> logger)
+    public PrintController(ILogger<PrintController> logger, Printer printer)
     {
         _logger = logger;
+        _printer = printer;
     }
 
     [HttpGet(Name = "Get")]
@@ -18,19 +20,15 @@ public class PrintController : ControllerBase
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-        var printer = new Printer(new ConfigurationProvider());
-        _logger.LogInformation("Start initializing wrapper");
-        await printer.Initialize();
-        _logger.LogInformation("Done initializing wrapper");
         _logger.LogInformation("Version");
-        var versionResult = await printer.Version();
+        var versionResult = await _printer.Version();
         _logger.LogInformation($" - ExitCode:            {versionResult.ExitCode}");
         _logger.LogInformation($" - HasError:            {versionResult.HasError}");
         _logger.LogInformation($" - Error:               {versionResult.Error}");
         _logger.LogInformation($" - RunTime:             {versionResult.RunTime}");
         _logger.LogInformation($" - Version:             {versionResult.Version}");
         _logger.LogInformation("Start printing");
-        var result = await printer.Print(@"
+        var result = await _printer.Print(@"
             <html>
             <body>
             <h1>Hello from Azure Function</h1>
@@ -55,12 +53,8 @@ public class PrintController : ControllerBase
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
 
-        var printer = new Printer(new ConfigurationProvider());
-        _logger.LogInformation("Start initializing wrapper");
-        await printer.Initialize();
-        _logger.LogInformation("Done initializing wrapper");
         _logger.LogInformation("Version");
-        var versionResult = await printer.Version();
+        var versionResult = await _printer.Version();
         _logger.LogInformation($" - ExitCode:            {versionResult.ExitCode}");
         _logger.LogInformation($" - HasError:            {versionResult.HasError}");
         _logger.LogInformation($" - Error:               {versionResult.Error}");
