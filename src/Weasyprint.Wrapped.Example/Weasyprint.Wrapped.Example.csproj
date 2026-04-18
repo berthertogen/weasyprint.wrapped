@@ -11,4 +11,10 @@
         <ProjectReference Include="..\Weasyprint.Wrapped\Weasyprint.Wrapped.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="..\Weasyprint.Wrapped\assets\standalone-*.zip">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>%(Filename)%(Extension)</Link>
+        </Content>
+    </ItemGroup>
 </Project>
