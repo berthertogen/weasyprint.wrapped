@@ -25,7 +25,11 @@ public class ConfigurationProvider
 
     public string GetAsset()
     {
-        var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "windows" : "linux";
+        var env = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? "windows"
+            : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                ? "linux"
+                : throw new PlatformNotSupportedException("Only Windows and Linux are supported by Weasyprint.Wrapped.");
         return Path.Combine(assetsFolder, $"standalone-{env}-64.zip");
     }
 
