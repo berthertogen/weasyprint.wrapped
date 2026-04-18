@@ -68,6 +68,9 @@ public class PrinterTests
         var fileStream = File.Create($"./weasyprinter/{version}");
         fileStream.Close();
 
+        var executableFileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "weasyprint.exe" : "weasyprint";
+        await File.WriteAllTextAsync(Path.Combine("./weasyprinter", executableFileName), "placeholder");
+
         var creationTimeBeforeAction = new DirectoryInfo("./weasyprinter").CreationTime;
         await Task.Delay(10);
         await GetPrinter().Initialize();
@@ -88,11 +91,8 @@ public class PrinterTests
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
-
-        var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
-        var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot, $"Expected/{filename}"));
-        File.WriteAllBytes(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_Result_Actual.pdf"), result.Bytes);
         Assert.True(result.Bytes.Length > 0);
+        AssertLooksLikePdf(result.Bytes);
     }
 
     [Fact]
@@ -110,11 +110,8 @@ public class PrinterTests
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
-
-        var filename = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Print_RunsCommand_Result_Windows_Expected.pdf" : "Print_RunsCommand_Result_Linux_Expected.pdf";
-        var expectedOutputBytes = File.ReadAllBytes(Path.Combine(testingProjectRoot, $"Expected/{filename}"));
-
         Assert.True(actualOutputBytes.Length > 0);
+        AssertLooksLikePdf(actualOutputBytes);
     }
 
     [Fact]
@@ -133,6 +130,7 @@ public class PrinterTests
 
         var outputFileBytes = await File.ReadAllBytesAsync(outputFile);
         Assert.True(outputFileBytes.Length > 0);
+        AssertLooksLikePdf(outputFileBytes);
     }
 
     [Fact]
@@ -152,6 +150,8 @@ public class PrinterTests
         Assert.False(resultOptimized.HasError);
 
         Assert.True(resultNormal.Bytes.Length > resultOptimized.Bytes.Length, $"Expected {resultNormal.Bytes.Length} to be greater than {resultOptimized.Bytes.Length}");
+        AssertLooksLikePdf(resultNormal.Bytes);
+        AssertLooksLikePdf(resultOptimized.Bytes);
     }
 
     [Fact]
@@ -191,12 +191,11 @@ public class PrinterTests
         var html = await File.ReadAllTextAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Input.html"), Encoding.UTF8);
         var result = await printer.Print(html);
 
-        await File.WriteAllBytesAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"), result.Bytes);
-
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
         Assert.True(result.Bytes.Length > 0);
+        AssertLooksLikePdf(result.Bytes);
     }
 
     [Fact]
@@ -209,13 +208,27 @@ public class PrinterTests
         var result = await printer.PrintStream(html);
 
         var actualBytes = (result.DocumentStream as MemoryStream)?.ToArray();
-        var expectedBytes = await File.ReadAllBytesAsync(Path.Combine(testingProjectRoot, "Expected/Print_RunsCommand_SpecialCharacters_Output.pdf"));
 
         Assert.True(string.IsNullOrWhiteSpace(result.Error), $"Should have no error but found {result.Error}");
         Assert.Equal(0, result.ExitCode);
         Assert.False(result.HasError);
         Assert.True(result.DocumentStream.Length > 0);
         Assert.True(actualBytes?.Length > 0);
+        AssertLooksLikePdf(actualBytes!);
+    }
+
+    [Fact]
+    public async Task Initialize_ThrowsHelpfulError_WhenAssetMissing()
+    {
+        var missingAssetsFolder = Path.Combine(testingProjectRoot, "assets", "this-directory-does-not-exist");
+        var config = new ConfigurationProvider(missingAssetsFolder, true, "weasyprinter", false);
+        var printer = new Printer(config);
+
+        var exception = await Assert.ThrowsAsync<InitializeException>(() => printer.Initialize());
+
+        Assert.True(
+            exception.Message.IndexOf("asset was not found", StringComparison.OrdinalIgnoreCase) >= 0,
+            $"Unexpected error message: {exception.Message}");
     }
 
     [Fact]
@@ -236,5 +249,15 @@ public class PrinterTests
     {
         var config = new ConfigurationProvider("../../../../../assets/", false, "weasyprinter", false);
         return new Printer(config);
+    }
+
+    private static void AssertLooksLikePdf(byte[] bytes)
+    {
+        Assert.True(bytes.Length > 5, "Expected generated PDF bytes to have a valid length.");
+        Assert.Equal((byte)'%', bytes[0]);
+        Assert.Equal((byte)'P', bytes[1]);
+        Assert.Equal((byte)'D', bytes[2]);
+        Assert.Equal((byte)'F', bytes[3]);
+        Assert.Equal((byte)'-', bytes[4]);
     }
 }
