@@ -94,6 +94,7 @@ public class Printer
                     })
                     .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
                     .WithWorkingDirectory(workingFolder)
+                    .WithValidation(CommandResultValidation.None)
                     .ExecuteAsync();
 
                 if (command.ExitCode != 0 || stdErrBuffer.Length > 0) throw new InitializeException(command, stdErrBuffer.ToString());
