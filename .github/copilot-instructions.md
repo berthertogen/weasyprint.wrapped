@@ -2,8 +2,8 @@
 
 ## Repository purpose
 - This repository packages a .NET wrapper around WeasyPrint.
-- Main library: `/home/runner/work/weasyprint.wrapped/weasyprint.wrapped/src/Weasyprint.Wrapped`
-- Tests: `/home/runner/work/weasyprint.wrapped/weasyprint.wrapped/src/Weasyprint.Wrapped.Tests`
+- Main library: `src/Weasyprint.Wrapped`
+- Tests: `src/Weasyprint.Wrapped.Tests`
 - Consumer samples: `Weasyprint.Wrapped.Example` and `Weasyprint.Wrapped.ExampleApi`
 
 ## Key architecture and flow
@@ -35,21 +35,21 @@ dotnet test --verbosity normal ./src/Weasyprint.Wrapped.Tests/Weasyprint.Wrapped
 ### Error encountered during onboarding
 Observed while running tests in a fresh clone:
 
-- `System.IO.DirectoryNotFoundException: Could not find a part of the path '/home/runner/work/weasyprint.wrapped/weasyprint.wrapped/assets/standalone-linux-64.zip'`
+- `System.IO.DirectoryNotFoundException: Could not find a part of the path '.../assets/standalone-linux-64.zip'`
 - `Test Run Failed. Total tests: 12, Failed: 12`
 
 ### Work-around
 - Generate Linux asset zip before testing:
 
 ```bash
-cd /home/runner/work/weasyprint.wrapped/weasyprint.wrapped
+cd <repository-root>
 ./build-on-linux.sh
 ```
 
 - For Windows asset generation (when needed on Windows runners):
 
 ```powershell
-cd /home/runner/work/weasyprint.wrapped/weasyprint.wrapped
+cd <repository-root>
 ./build-on-windows.ps1
 ```
 
