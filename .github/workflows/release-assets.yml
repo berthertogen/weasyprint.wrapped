@@ -49,7 +49,7 @@ jobs:
           zip -d standalone-windows-64.zip "version-*"
           zip -ur standalone-windows-64.zip version-${{ steps.set_version.outputs.tag-no-v }}
       - name: Create nuget package
-        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
+        run: dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=${{ steps.set_version.outputs.tag-no-v }} -p:Version=${{ steps.set_version.outputs.tag-no-v }} -p:AssemblyVersion=${{ steps.set_version.outputs.tag-no-v }} -p:FileVersion=${{ steps.set_version.outputs.tag-no-v }} --output nupkgs
         working-directory: ./src/Weasyprint.Wrapped
       - name: Add github source
         run: dotnet nuget add source --username bert@hertogen.net --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/berthertogen/index.json"
