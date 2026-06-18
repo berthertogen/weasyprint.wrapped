@@ -40,6 +40,12 @@ There are resources which will be extracted during initialization, the size of i
 - +-29 MB zipped resource (official standalone windows executable) which will be unzipped in the same folder (for Windows).
 - +-26 MB zipped resource (standalone build weasyprint) which will be unzipped in the same folder (for Linux).
 
+At the moment the out of the box experience is NOT available for .netframework projects using packages.config!
+In short, the package will not be able to find the resources when using packages.config.   
+The reason is that the resources are not copied to the output folder when using packages.config.   
+The solution is to use PackageReference instead of packages.config or manually bootstrap the folders.  
+More details in [issue 84](https://github.com/berthertogen/weasyprint.wrapped/issues/84)
+
 # Extra resources
 
 ## References
